@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/utils.dart';
 
@@ -15,7 +16,7 @@ class _ExistingLineScreenState extends State<ExistingLineScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Existing Line'),
+        title: AppbarTitileWithSubtitle(title: 'Existing Line'),
         actions: <Widget>[
           IconButton(
             icon: Icon(

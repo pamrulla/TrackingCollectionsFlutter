@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
 import 'package:tracking_collections/components/myIconRaisedButton.dart';
 import 'package:tracking_collections/screens/add_customer_screen.dart';
 import 'package:tracking_collections/screens/duration_bottom_screen.dart';
@@ -16,7 +17,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tracking Collections'),
+        title: AppbarTitileWithSubtitle(title: 'Tracking Collections'),
         actions: <Widget>[
           IconButton(
             icon: Icon(

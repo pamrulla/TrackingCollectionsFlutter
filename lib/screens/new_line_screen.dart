@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
 import 'package:tracking_collections/components/cities_popupmenubutton.dart';
 import 'package:tracking_collections/components/custom_text_from_field.dart';
 import 'package:tracking_collections/components/form_sub_heading_text.dart';
@@ -56,18 +57,9 @@ class _NewLineScreenState extends State<NewLineScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('New Line'),
-            Text(
-              'Adding Agent',
-              style: TextStyle(
-                fontSize: 16.0,
-              ),
-            ),
-          ],
+        title: AppbarTitileWithSubtitle(
+          title: 'New Line',
+          subTitle: 'Adding Agent(s)',
         ),
         actions: <Widget>[
           IconButton(
@@ -167,7 +159,9 @@ class _NewLineScreenState extends State<NewLineScreen> {
                                         icon: Icons.verified_user,
                                         hintText: 'Agent Number',
                                         validator: (value) {
-                                          if (value.isEmpty) {
+                                          if (value.isEmpty ||
+                                              !Utils.isNumeric(value) ||
+                                              value.length < 10) {
                                             return 'Agent Number should not be empty';
                                           }
                                           return null;
@@ -183,6 +177,7 @@ class _NewLineScreenState extends State<NewLineScreen> {
                                         onFieldSubmitted: (term) {
                                           Utils.closeKeyboard(context);
                                         },
+                                        keyboardType: TextInputType.phone,
                                       ),
                                     ],
                                   ),

@@ -15,6 +15,7 @@ class CustomTextFromField extends StatelessWidget {
   final ValueChanged<String> onFieldSubmitted;
   final int maxLength;
   final bool obscureText;
+  final bool enabled;
 
   CustomTextFromField(
       {@required this.focusNode,
@@ -29,7 +30,8 @@ class CustomTextFromField extends StatelessWidget {
       this.maxLines = 1,
       this.onFieldSubmitted,
       this.maxLength,
-      this.obscureText = false});
+      this.obscureText = false,
+      this.enabled = true});
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +56,7 @@ class CustomTextFromField extends StatelessWidget {
             hintStyle: TextStyle(
                 //color: Color(0xaa904eb0),
                 ),
+            labelText: hintText,
             border: new OutlineInputBorder(
               borderRadius: new BorderRadius.circular(25.0),
               borderSide: new BorderSide(),
@@ -70,6 +73,7 @@ class CustomTextFromField extends StatelessWidget {
           onFieldSubmitted: onFieldSubmitted,
           maxLength: maxLength,
           obscureText: obscureText,
+          enabled: enabled,
         ),
       ),
     );
