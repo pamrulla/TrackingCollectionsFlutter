@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
+import 'package:tracking_collections/components/goto_home_widget.dart';
+import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/utils/constants.dart';
-import 'package:tracking_collections/utils/utils.dart';
 
 class ExistingLineScreen extends StatefulWidget {
   final DurationEnum currentMode;
@@ -18,15 +19,8 @@ class _ExistingLineScreenState extends State<ExistingLineScreen> {
       appBar: AppBar(
         title: AppbarTitileWithSubtitle(title: 'Existing Line'),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.power_settings_new,
-              color: Theme.of(context).iconTheme.color,
-            ),
-            onPressed: () {
-              Utils.logOut(context);
-            },
-          ),
+          GotoHome(),
+          Logout(),
         ],
       ),
       body: Container(

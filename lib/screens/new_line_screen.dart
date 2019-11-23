@@ -3,6 +3,8 @@ import 'package:tracking_collections/components/appbar_title_with_subtitle.dart'
 import 'package:tracking_collections/components/cities_popupmenubutton.dart';
 import 'package:tracking_collections/components/custom_text_from_field.dart';
 import 'package:tracking_collections/components/form_sub_heading_text.dart';
+import 'package:tracking_collections/components/goto_home_widget.dart';
+import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/components/myRaisedButton.dart';
 import 'package:tracking_collections/screens/add_customer_screen.dart';
 import 'package:tracking_collections/utils/constants.dart';
@@ -62,15 +64,8 @@ class _NewLineScreenState extends State<NewLineScreen> {
           subTitle: 'Adding Agent(s)',
         ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.power_settings_new,
-              color: Theme.of(context).iconTheme.color,
-            ),
-            onPressed: () {
-              Utils.logOut(context);
-            },
-          ),
+          GotoHome(),
+          Logout(),
         ],
       ),
       body: Column(

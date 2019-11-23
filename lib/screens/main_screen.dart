@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
+import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/components/myIconRaisedButton.dart';
-import 'package:tracking_collections/screens/add_customer_screen.dart';
+import 'package:tracking_collections/screens/agent_list_screen.dart';
 import 'package:tracking_collections/screens/duration_bottom_screen.dart';
 import 'package:tracking_collections/screens/new_line_screen.dart';
 import 'package:tracking_collections/utils/constants.dart';
-import 'package:tracking_collections/utils/utils.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -19,15 +19,7 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: AppbarTitileWithSubtitle(title: 'Tracking Collections'),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.power_settings_new,
-              color: Theme.of(context).iconTheme.color,
-            ),
-            onPressed: () {
-              Utils.logOut(context);
-            },
-          ),
+          Logout(),
         ],
       ),
       body: SafeArea(
@@ -95,8 +87,8 @@ class _MainScreenState extends State<MainScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) {
-        return AddCustomerScreen(
-          currentMode: duration,
+        return AgentListScreen(
+          currentDurationType: duration,
         );
       }),
     );

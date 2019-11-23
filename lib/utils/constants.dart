@@ -12,3 +12,12 @@ const List<String> cities = [
   'Khammam',
   'Narsapuram'
 ];
+enum agentListActionsEnum { CustomersList, NewCustomer }
+const List<String> agentListActions = [
+  'View Customers List',
+  'Add New Customer'
+];
+const List<IconData> agentListActionsIcons = [
+  Icons.view_list,
+  Icons.add_circle
+];

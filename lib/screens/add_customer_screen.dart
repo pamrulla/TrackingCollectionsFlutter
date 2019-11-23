@@ -3,8 +3,9 @@ import 'package:tracking_collections/components/appbar_title_with_subtitle.dart'
 import 'package:tracking_collections/components/customer_basic_details_form.dart';
 import 'package:tracking_collections/components/customer_document_form.dart';
 import 'package:tracking_collections/components/customer_lending_info_form.dart';
+import 'package:tracking_collections/components/goto_home_widget.dart';
+import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/utils/constants.dart';
-import 'package:tracking_collections/utils/utils.dart';
 
 class AddCustomerScreen extends StatefulWidget {
   final DurationEnum currentMode;
@@ -63,15 +64,8 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
           subTitle: currentSubTitle,
         ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.power_settings_new,
-              color: Theme.of(context).iconTheme.color,
-            ),
-            onPressed: () {
-              Utils.logOut(context);
-            },
-          ),
+          GotoHome(),
+          Logout(),
         ],
       ),
       body: Padding(
