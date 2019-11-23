@@ -143,6 +143,9 @@ class _AgentListScreenState extends State<AgentListScreen> {
         return AgentSheetBottomScreen();
       },
     );
+    if (action == null) {
+      return;
+    }
     if (action == agentListActionsEnum.CustomersList) {
       Navigator.push(
         context,

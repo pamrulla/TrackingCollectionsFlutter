@@ -30,11 +30,13 @@ class _MainScreenState extends State<MainScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Expanded(
-                flex: 5,
-                child: Image.asset('images/icon.png'),
+                flex: 4,
+                child: Image.asset(
+                  'images/logo.png',
+                ),
               ),
               SizedBox(
-                width: 10.0,
+                height: 20.0,
               ),
               Expanded(
                 flex: 1,
@@ -84,6 +86,9 @@ class _MainScreenState extends State<MainScreen> {
         return DurationBottomScreen();
       },
     );
+    if (duration == null) {
+      return;
+    }
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) {

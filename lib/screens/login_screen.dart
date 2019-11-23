@@ -32,75 +32,86 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: SingleChildScrollView(
-          child: Center(
-            child: Form(
-                key: _formKey,
-                child: Padding(
-                  padding: const EdgeInsets.all(40.0),
-                  child: Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Image.asset('images/icon.png'),
-                        CustomTextFromField(
-                          focusNode: _focusNodeUserName,
-                          icon: Icons.verified_user,
-                          hintText: 'Username',
-                          validator: (value) {
-                            if (value.isEmpty) {
-                              return 'Username should not be empty';
-                            }
-                            return null;
-                          },
-                          controller: _textEditingControllerUserName,
-                          onSaved: (val) {
-                            setState(() {
-                              _userName = val;
-                            });
-                          },
-                          textInputAction: TextInputAction.next,
-                          onFieldSubmitted: (term) {
-                            Utils.fieldFocusChange(context, _focusNodeUserName,
-                                _focusNodePassword);
-                          },
+        body: Column(
+          children: <Widget>[
+            Expanded(
+              child: SingleChildScrollView(
+                child: Center(
+                  child: Form(
+                    key: _formKey,
+                    child: Padding(
+                      padding: const EdgeInsets.all(40.0),
+                      child: Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Image.asset(
+                              'images/logo.png',
+                              width: 200,
+                              height: 200,
+                            ),
+                            CustomTextFromField(
+                              focusNode: _focusNodeUserName,
+                              icon: Icons.verified_user,
+                              hintText: 'Username',
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Username should not be empty';
+                                }
+                                return null;
+                              },
+                              controller: _textEditingControllerUserName,
+                              onSaved: (val) {
+                                setState(() {
+                                  _userName = val;
+                                });
+                              },
+                              textInputAction: TextInputAction.next,
+                              onFieldSubmitted: (term) {
+                                Utils.fieldFocusChange(context,
+                                    _focusNodeUserName, _focusNodePassword);
+                              },
+                            ),
+                            CustomTextFromField(
+                              focusNode: _focusNodePassword,
+                              icon: Icons.verified_user,
+                              hintText: 'Password',
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Username should not be empty';
+                                }
+                                return null;
+                              },
+                              controller: _textEditingControllerPassword,
+                              onSaved: (val) {
+                                setState(() {
+                                  _password = val;
+                                });
+                              },
+                              textInputAction: TextInputAction.done,
+                              keyboardType: TextInputType.visiblePassword,
+                              onFieldSubmitted: (term) {
+                                Utils.closeKeyboard(context);
+                              },
+                              obscureText: true,
+                            ),
+                            SizedBox(
+                              height: 20.0,
+                            ),
+                            MyRaisedButton(
+                              name: 'Login',
+                              onPressed: onLogin,
+                            )
+                          ],
                         ),
-                        CustomTextFromField(
-                          focusNode: _focusNodePassword,
-                          icon: Icons.verified_user,
-                          hintText: 'Password',
-                          validator: (value) {
-                            if (value.isEmpty) {
-                              return 'Username should not be empty';
-                            }
-                            return null;
-                          },
-                          controller: _textEditingControllerPassword,
-                          onSaved: (val) {
-                            setState(() {
-                              _password = val;
-                            });
-                          },
-                          textInputAction: TextInputAction.done,
-                          keyboardType: TextInputType.visiblePassword,
-                          onFieldSubmitted: (term) {
-                            Utils.closeKeyboard(context);
-                          },
-                          obscureText: true,
-                        ),
-                        SizedBox(
-                          height: 20.0,
-                        ),
-                        MyRaisedButton(
-                          name: 'Login',
-                          onPressed: onLogin,
-                        )
-                      ],
+                      ),
                     ),
                   ),
-                )),
-          ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

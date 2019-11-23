@@ -8,7 +8,23 @@ class CustomerViewScreen extends StatefulWidget {
   _CustomerViewScreenState createState() => _CustomerViewScreenState();
 }
 
-class _CustomerViewScreenState extends State<CustomerViewScreen> {
+class _CustomerViewScreenState extends State<CustomerViewScreen>
+    with SingleTickerProviderStateMixin {
+  TabController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TabController(vsync: this, length: 4);
+    _controller.addListener(_handleTabSelection);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   Widget getBasicDetails() {
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(),
@@ -244,50 +260,68 @@ class _CustomerViewScreenState extends State<CustomerViewScreen> {
     );
   }
 
+  Widget getFloatingActionButton() {
+    if (_controller.index == 1 || _controller.index == 2) {
+      return FloatingActionButton(
+        onPressed: () {},
+        child: Icon(Icons.add),
+        backgroundColor: Theme.of(context).accentColor,
+      );
+    } else {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        appBar: AppBar(
-          bottom: TabBar(
-            tabs: [
-              Tab(
-                icon: Icon(Icons.details),
-                text: 'Basic Details',
-              ),
-              Tab(
-                icon: Icon(Icons.payment),
-                text: 'Payment Details',
-              ),
-              Tab(
-                icon: Icon(Icons.confirmation_number),
-                text: 'Penalty Details',
-              ),
-              Tab(
-                icon: Icon(Icons.security),
-                text: 'Security Details',
-              ),
-            ],
-          ),
-          title: AppbarTitileWithSubtitle(
-            title: 'Customer View',
-          ),
-          actions: <Widget>[
-            GotoHome(),
-            Logout(),
+    return Scaffold(
+      appBar: AppBar(
+        bottom: TabBar(
+          controller: _controller,
+          tabs: [
+            Tab(
+              icon: Icon(Icons.details),
+              text: 'Basic Details',
+            ),
+            Tab(
+              icon: Icon(Icons.payment),
+              text: 'Payment Details',
+            ),
+            Tab(
+              icon: Icon(Icons.confirmation_number),
+              text: 'Penalty Details',
+            ),
+            Tab(
+              icon: Icon(Icons.security),
+              text: 'Security Details',
+            ),
           ],
         ),
-        body: TabBarView(
-          children: [
-            Container(child: getBasicDetails()),
-            Container(child: getPaymentDetails()),
-            Container(child: getPenaltyDetails()),
-            Container(child: getSecurityDetails()),
-          ],
+        title: AppbarTitileWithSubtitle(
+          title: 'Customer View',
         ),
+        actions: <Widget>[
+          GotoHome(),
+          Logout(),
+        ],
+      ),
+      floatingActionButton: getFloatingActionButton(),
+      body: TabBarView(
+        controller: _controller,
+        children: [
+          Container(child: getBasicDetails()),
+          Container(child: getPaymentDetails()),
+          Container(child: getPenaltyDetails()),
+          Container(child: getSecurityDetails()),
+        ],
       ),
     );
+  }
+
+  void _handleTabSelection() {
+    if (_controller.indexIsChanging) {
+      setState(() {});
+    }
   }
 }
 
