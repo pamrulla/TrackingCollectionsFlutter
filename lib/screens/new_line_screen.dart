@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
+import 'package:tracking_collections/components/bottom_navigation_bar.dart';
 import 'package:tracking_collections/components/cities_popupmenubutton.dart';
 import 'package:tracking_collections/components/custom_text_from_field.dart';
 import 'package:tracking_collections/components/form_sub_heading_text.dart';
 import 'package:tracking_collections/components/goto_home_widget.dart';
 import 'package:tracking_collections/components/logout_widget.dart';
-import 'package:tracking_collections/components/myRaisedButton.dart';
 import 'package:tracking_collections/screens/add_customer_screen.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/utils.dart';
@@ -67,6 +67,9 @@ class _NewLineScreenState extends State<NewLineScreen> {
           GotoHome(),
           Logout(),
         ],
+      ),
+      bottomNavigationBar: MyBottomnaviationBar(
+        onTap: _onAddingAgent,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -191,67 +194,62 @@ class _NewLineScreenState extends State<NewLineScreen> {
               ),
             ),
           ),
-          Expanded(
-              flex: 1,
-              child: Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: MyRaisedButton(
-                  name: 'Add Agent(s)',
-                  onPressed: _onAddingAgent,
-                ),
-              )),
         ],
       ),
     );
   }
 
-  Future<void> _onAddingAgent() async {
-    int result = await showDialog<int>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Success...',
-            style: TextStyle(
-              color: Colors.green,
+  Future<void> _onAddingAgent(int value) async {
+    if (value == 1) {
+      int result = await showDialog<int>(
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+              'Success...',
+              style: TextStyle(
+                color: Colors.green,
+              ),
             ),
-          ),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Where do you want to go?'),
-              ],
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text('Where do you want to go?'),
+                ],
+              ),
             ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Home'),
-              onPressed: () {
-                Navigator.of(context).pop(1);
-              },
-            ),
-            FlatButton(
-              child: Text('Add New Customer'),
-              onPressed: () {
-                Navigator.of(context).pop(2);
-              },
-            ),
-          ],
-        );
-      },
-    );
-    if (result == 1) {
-      Navigator.of(context).pop();
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) {
-          return AddCustomerScreen(
-            currentMode: _duration,
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Home'),
+                onPressed: () {
+                  Navigator.of(context).pop(1);
+                },
+              ),
+              FlatButton(
+                child: Text('Add New Customer'),
+                onPressed: () {
+                  Navigator.of(context).pop(2);
+                },
+              ),
+            ],
           );
-        }),
+        },
       );
+      if (result == 1) {
+        Navigator.of(context).pop();
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) {
+            return AddCustomerScreen(
+              currentMode: _duration,
+            );
+          }),
+        );
+      }
+    } else {
+      Navigator.pop(context);
     }
   }
 }

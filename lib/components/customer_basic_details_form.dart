@@ -2,14 +2,17 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tracking_collections/components/bottom_form_button_row.dart';
 import 'package:tracking_collections/components/custom_text_from_field.dart';
 import 'package:tracking_collections/utils/utils.dart';
 
 class CustomerBasicDetailsForm extends StatefulWidget {
   final Function onContinue;
   final Function onBack;
-  CustomerBasicDetailsForm({@required this.onContinue, @required this.onBack});
+  GlobalKey<FormState> formKey;
+  CustomerBasicDetailsForm(
+      {@required this.formKey,
+      @required this.onContinue,
+      @required this.onBack});
 
   @override
   _CustomerBasicDetailsFormState createState() =>
@@ -17,7 +20,7 @@ class CustomerBasicDetailsForm extends StatefulWidget {
 }
 
 class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  GlobalKey<FormState> _formKey;
   bool _sameAsPermanentAddress = false;
   FocusNode _focusNodeName = FocusNode();
   TextEditingController _textEditingControllerName = TextEditingController();
@@ -40,6 +43,12 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
   TextEditingController _textEditingControllerPhone = TextEditingController();
 
   File _image = null;
+
+  @override
+  void initState() {
+    super.initState();
+    _formKey = widget.formKey;
+  }
 
   void takePhoto() async {
     var image = await ImagePicker.pickImage(source: ImageSource.camera);
@@ -233,23 +242,7 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
             ),
           ),
         ),
-        Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: ButtomFormButtonRow(
-                onContinue: onStepContinue,
-                onBack: widget.onBack,
-              ),
-            )),
       ],
     );
-  }
-
-  void onStepContinue() {
-    if (!_formKey.currentState.validate() && _image != null) {
-      _formKey.currentState.save();
-      widget.onContinue();
-    }
   }
 }

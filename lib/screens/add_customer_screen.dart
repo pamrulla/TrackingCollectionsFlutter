@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
+import 'package:tracking_collections/components/bottom_navigation_bar.dart';
 import 'package:tracking_collections/components/customer_basic_details_form.dart';
 import 'package:tracking_collections/components/customer_document_form.dart';
 import 'package:tracking_collections/components/customer_lending_info_form.dart';
@@ -25,27 +26,36 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     "Security: Basic Details",
     "Security: Documents"
   ];
+  List<GlobalKey<FormState>> keys = [];
 
   @override
   void initState() {
     super.initState();
+    for (int i = 0; i < _subTitles.length; ++i) {
+      keys.add(GlobalKey<FormState>());
+    }
     _formWidgets.add(CustomerBasicDetailsForm(
+      formKey: keys[0],
       onBack: onBack,
       onContinue: onContinue,
     ));
     _formWidgets.add(CustomerLendingInfoForm(
+      formKey: keys[1],
       onBack: onBack,
       onContinue: onContinue,
     ));
     _formWidgets.add(CustomerDocumentForm(
+      formKey: keys[2],
       onBack: onBack,
       onContinue: onContinue,
     ));
     _formWidgets.add(CustomerBasicDetailsForm(
+      formKey: keys[3],
       onBack: onBack,
       onContinue: onContinue,
     ));
     _formWidgets.add(CustomerDocumentForm(
+      formKey: keys[4],
       onBack: onBack,
       onContinue: onContinue,
     ));
@@ -68,6 +78,9 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
           Logout(),
         ],
       ),
+      bottomNavigationBar: MyBottomnaviationBar(
+        onTap: (value) => onBottomBarAction(value),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Center(
@@ -78,11 +91,14 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
   }
 
   void onContinue() {
-    _currentStep += 1;
-    if (_formWidgets.length == _currentStep) {
-      Navigator.pop(context);
-    } else {
-      setState(() {});
+    if (!keys[_currentStep].currentState.validate()) {
+      keys[_currentStep].currentState.save();
+      _currentStep += 1;
+      if (_formWidgets.length == _currentStep) {
+        Navigator.pop(context);
+      } else {
+        setState(() {});
+      }
     }
   }
 
@@ -93,6 +109,14 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       setState(() {
         _currentStep -= 1;
       });
+    }
+  }
+
+  onBottomBarAction(value) {
+    if (value == 0) {
+      onBack();
+    } else {
+      onContinue();
     }
   }
 }

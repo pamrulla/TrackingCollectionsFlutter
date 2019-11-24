@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:tracking_collections/components/bottom_form_button_row.dart';
 import 'package:tracking_collections/components/custom_text_from_field.dart';
 import 'package:tracking_collections/utils/utils.dart';
 
 class CustomerLendingInfoForm extends StatefulWidget {
   final Function onContinue;
   final Function onBack;
-  CustomerLendingInfoForm({@required this.onContinue, @required this.onBack});
+  GlobalKey<FormState> formKey;
+  CustomerLendingInfoForm(
+      {@required this.formKey,
+      @required this.onContinue,
+      @required this.onBack});
 
   @override
   _CustomerLendingInfoFormState createState() =>
@@ -14,7 +17,7 @@ class CustomerLendingInfoForm extends StatefulWidget {
 }
 
 class _CustomerLendingInfoFormState extends State<CustomerLendingInfoForm> {
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  GlobalKey<FormState> _formKey;
   FocusNode _focusNodeDate = FocusNode();
   TextEditingController _textEditingControllerDate = TextEditingController();
   FocusNode _focusNodeAmount = FocusNode();
@@ -28,6 +31,7 @@ class _CustomerLendingInfoFormState extends State<CustomerLendingInfoForm> {
   @override
   void initState() {
     super.initState();
+    _formKey = widget.formKey;
     _textEditingControllerDate.text = Utils.getTodayDate();
   }
 
@@ -42,7 +46,7 @@ class _CustomerLendingInfoFormState extends State<CustomerLendingInfoForm> {
             hintText: 'Start Date',
             validator: (value) {
               if (value.isEmpty) {
-                return 'Customer Name should not be empty';
+                return 'Date should not be empty';
               }
               return null;
             },
@@ -134,24 +138,7 @@ class _CustomerLendingInfoFormState extends State<CustomerLendingInfoForm> {
             ),
           ),
         ),
-        Expanded(
-          flex: 1,
-          child: Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: ButtomFormButtonRow(
-              onContinue: onStepContinue,
-              onBack: widget.onBack,
-            ),
-          ),
-        ),
       ],
     );
-  }
-
-  void onStepContinue() {
-    if (!_formKey.currentState.validate()) {
-      _formKey.currentState.save();
-      widget.onContinue();
-    }
   }
 }

@@ -31,8 +31,11 @@ class _MainScreenState extends State<MainScreen> {
             children: <Widget>[
               Expanded(
                 flex: 4,
-                child: Image.asset(
-                  'images/logo.png',
+                child: Hero(
+                  tag: 'logo',
+                  child: Image.asset(
+                    'images/logo.png',
+                  ),
                 ),
               ),
               SizedBox(

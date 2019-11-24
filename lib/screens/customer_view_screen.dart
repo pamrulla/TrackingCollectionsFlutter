@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
 import 'package:tracking_collections/components/goto_home_widget.dart';
 import 'package:tracking_collections/components/logout_widget.dart';
+import 'package:tracking_collections/models/customer.dart';
+import 'package:tracking_collections/screens/amount_recieve_bottom_screen.dart';
 
 class CustomerViewScreen extends StatefulWidget {
   @override
@@ -11,6 +13,7 @@ class CustomerViewScreen extends StatefulWidget {
 class _CustomerViewScreenState extends State<CustomerViewScreen>
     with SingleTickerProviderStateMixin {
   TabController _controller;
+  final globalKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -261,9 +264,12 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
   }
 
   Widget getFloatingActionButton() {
+    print(_controller.index);
     if (_controller.index == 1 || _controller.index == 2) {
       return FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          viewDurationBottomSheet(context);
+        },
         child: Icon(Icons.add),
         backgroundColor: Theme.of(context).accentColor,
       );
@@ -275,6 +281,7 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: globalKey,
       appBar: AppBar(
         bottom: TabBar(
           controller: _controller,
@@ -319,8 +326,33 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
   }
 
   void _handleTabSelection() {
-    if (_controller.indexIsChanging) {
-      setState(() {});
+    setState(() {});
+  }
+
+  void viewDurationBottomSheet(BuildContext context) async {
+    Transaction trans = await showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        String title =
+            (_controller.index == 1) ? 'Payment Form' : 'Penalty Form';
+        return AmountRecieveBottomScreen(title);
+      },
+    );
+    if (trans == null) {
+      return;
+    } else {
+      String content = 'Transaction added on ' +
+          trans.date +
+          ' for amount Rs. ' +
+          trans.amount.toString();
+      final snackBar = SnackBar(
+        content: Text(
+          content,
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Colors.green,
+      );
+      globalKey.currentState.showSnackBar(snackBar);
     }
   }
 }

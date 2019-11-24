@@ -46,10 +46,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Image.asset(
-                              'images/logo.png',
-                              width: 200,
-                              height: 200,
+                            Hero(
+                              tag: 'logo',
+                              child: Image.asset(
+                                'images/logo.png',
+                                width: 200,
+                                height: 200,
+                              ),
                             ),
                             CustomTextFromField(
                               focusNode: _focusNodeUserName,
