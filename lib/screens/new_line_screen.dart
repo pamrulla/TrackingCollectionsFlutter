@@ -5,6 +5,7 @@ import 'package:tracking_collections/components/cities_popupmenubutton.dart';
 import 'package:tracking_collections/components/custom_text_from_field.dart';
 import 'package:tracking_collections/components/form_sub_heading_text.dart';
 import 'package:tracking_collections/components/goto_home_widget.dart';
+import 'package:tracking_collections/components/loading_please_wait.dart';
 import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/models/agent.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
@@ -80,7 +81,7 @@ class _NewLineScreenState extends State<NewLineScreen> {
         onTap: _onAddingAgent,
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? LoadingPleaseWait()
           : Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
@@ -280,16 +281,7 @@ class _NewLineScreenState extends State<NewLineScreen> {
         if (isSuccess) {
           await onSuccess();
         } else {
-          String content =
-              'Some thing went wrong while adding Agent, please try again';
-          final snackBar = SnackBar(
-            content: Text(
-              content,
-              textAlign: TextAlign.center,
-            ),
-            backgroundColor: Theme.of(context).errorColor,
-          );
-          globalKey.currentState.showSnackBar(snackBar);
+          Utils.showErrorSnackBar(globalKey);
         }
       }
     } else {

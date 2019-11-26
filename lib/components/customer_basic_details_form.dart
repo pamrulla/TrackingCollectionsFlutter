@@ -3,16 +3,19 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tracking_collections/components/custom_text_from_field.dart';
+import 'package:tracking_collections/models/basic_details.dart';
 import 'package:tracking_collections/utils/utils.dart';
 
 class CustomerBasicDetailsForm extends StatefulWidget {
   final Function onContinue;
   final Function onBack;
+  final BasicDetails data;
   GlobalKey<FormState> formKey;
   CustomerBasicDetailsForm(
       {@required this.formKey,
       @required this.onContinue,
-      @required this.onBack});
+      @required this.onBack,
+      @required this.data});
 
   @override
   _CustomerBasicDetailsFormState createState() =>
@@ -54,6 +57,7 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
     var image = await ImagePicker.pickImage(source: ImageSource.camera);
     setState(() {
       _image = image;
+      widget.data.photo = _image.path;
     });
   }
 
@@ -92,7 +96,9 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
               return null;
             },
             controller: _textEditingControllerName,
-            onSaved: (val) {},
+            onSaved: (val) {
+              widget.data.name = val;
+            },
             textInputAction: TextInputAction.next,
             onFieldSubmitted: (term) {
               Utils.fieldFocusChange(
@@ -110,7 +116,9 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
               return null;
             },
             controller: _textEditingControllerFatherName,
-            onSaved: (val) {},
+            onSaved: (val) {
+              widget.data.fatherName = val;
+            },
             textInputAction: TextInputAction.next,
             onFieldSubmitted: (term) {
               Utils.fieldFocusChange(
@@ -128,7 +136,9 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
               return null;
             },
             controller: _textEditingControllerOccupation,
-            onSaved: (val) {},
+            onSaved: (val) {
+              widget.data.occupation = val;
+            },
             textInputAction: TextInputAction.next,
             onFieldSubmitted: (term) {
               Utils.fieldFocusChange(
@@ -146,7 +156,9 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
               return null;
             },
             controller: _textEditingControllerAdharNumber,
-            onSaved: (val) {},
+            onSaved: (val) {
+              widget.data.adharNumber = val;
+            },
             textInputAction: TextInputAction.next,
             keyboardType: TextInputType.number,
             onFieldSubmitted: (term) {
@@ -179,6 +191,7 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
             onChanged: (value) {
               setState(() {
                 _sameAsPermanentAddress = value;
+                widget.data.isSameAsPermanentAddress = value;
               });
             },
           ),
@@ -193,7 +206,9 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
               return null;
             },
             controller: _textEditingControllerPermanentAddress,
-            onSaved: (val) {},
+            onSaved: (val) {
+              widget.data.permanentAddress = val;
+            },
             textInputAction: _sameAsPermanentAddress
                 ? TextInputAction.done
                 : TextInputAction.next,
@@ -211,13 +226,15 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
             icon: Icons.verified_user,
             hintText: 'Current Address',
             validator: (value) {
-              if (value.isEmpty) {
+              if (_sameAsPermanentAddress == false && value.isEmpty) {
                 return 'Current Address should not be empty';
               }
               return null;
             },
             controller: _textEditingControllerTemporaryAddress,
-            onSaved: (val) {},
+            onSaved: (val) {
+              widget.data.temporaryAddress = val;
+            },
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (term) {
               Utils.closeKeyboard(context);

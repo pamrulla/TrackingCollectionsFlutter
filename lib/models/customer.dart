@@ -1,14 +1,3 @@
-class CustomerBasicDetails {
-  int id;
-  String photo;
-  String name;
-  String occupation;
-  String fatherName;
-  String adharNumber;
-  String permanantAddress;
-  String temporaryAddress;
-}
-
 class CustomerPhoneNumber {
   int id;
   int customer;

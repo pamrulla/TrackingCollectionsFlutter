@@ -5,8 +5,12 @@ import 'package:tracking_collections/components/customer_basic_details_form.dart
 import 'package:tracking_collections/components/customer_document_form.dart';
 import 'package:tracking_collections/components/customer_lending_info_form.dart';
 import 'package:tracking_collections/components/goto_home_widget.dart';
+import 'package:tracking_collections/components/loading_please_wait.dart';
 import 'package:tracking_collections/components/logout_widget.dart';
+import 'package:tracking_collections/models/basic_details.dart';
+import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/utils/constants.dart';
+import 'package:tracking_collections/utils/utils.dart';
 
 class AddCustomerScreen extends StatefulWidget {
   final DurationEnum currentMode;
@@ -17,6 +21,8 @@ class AddCustomerScreen extends StatefulWidget {
 }
 
 class _AddCustomerScreenState extends State<AddCustomerScreen> {
+  GlobalKey<ScaffoldState> globalKey = GlobalKey<ScaffoldState>();
+  bool _isLoading = false;
   int _currentStep = 0;
   List<Widget> _formWidgets = [];
   final List<String> _subTitles = [
@@ -28,6 +34,8 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
   ];
   List<GlobalKey<FormState>> keys = [];
 
+  BasicDetails _basicDetails = BasicDetails();
+
   @override
   void initState() {
     super.initState();
@@ -38,6 +46,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       formKey: keys[0],
       onBack: onBack,
       onContinue: onContinue,
+      data: _basicDetails,
     ));
     _formWidgets.add(CustomerLendingInfoForm(
       formKey: keys[1],
@@ -53,6 +62,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       formKey: keys[3],
       onBack: onBack,
       onContinue: onContinue,
+      data: _basicDetails,
     ));
     _formWidgets.add(CustomerDocumentForm(
       formKey: keys[4],
@@ -68,6 +78,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     currentSubTitle +=
         " (" + cs.toString() + "/" + _formWidgets.length.toString() + ")";
     return Scaffold(
+      key: globalKey,
       appBar: AppBar(
         title: AppbarTitileWithSubtitle(
           title: 'Adding New Customer',
@@ -81,35 +92,68 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       bottomNavigationBar: MyBottomnaviationBar(
         onTap: (value) => onBottomBarAction(value),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Center(
-          child: _formWidgets[_currentStep],
-        ),
-      ),
+      body: _isLoading
+          ? LoadingPleaseWait()
+          : Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Center(
+                child: _formWidgets[_currentStep],
+              ),
+            ),
     );
   }
 
-  void onContinue() {
-    if (!keys[_currentStep].currentState.validate()) {
+  void displayLoading(bool value) {
+    setState(() {
+      _isLoading = value;
+    });
+  }
+
+  Future<bool> addBasicDetails() async {
+    if (_basicDetails.photo == null || _basicDetails.photo.isEmpty) {
+      Utils.showErrorSnackBar(globalKey,
+          text: 'Photo of customer should not be empty...');
+      return false;
+    }
+    String url =
+        await DBManager.instance.uploadFileAndGetUrl(_basicDetails.photo);
+    if (url.isEmpty) {
+      return false;
+    }
+    Utils.deleteFile(_basicDetails.photo);
+    _basicDetails.photo = url;
+    return await DBManager.instance.addBasicDetails(_basicDetails);
+  }
+
+  void onContinue() async {
+    if (keys[_currentStep].currentState.validate()) {
       keys[_currentStep].currentState.save();
-      _currentStep += 1;
-      if (_formWidgets.length == _currentStep) {
-        Navigator.pop(context);
-      } else {
-        setState(() {});
+      bool isSuccess = false;
+      displayLoading(true);
+      if (_currentStep == 0) {
+        isSuccess = await addBasicDetails();
+      }
+      displayLoading(false);
+      if (isSuccess == true) {
+        Utils.showSuccessSnackBar(globalKey);
+        _currentStep += 1;
+        if (_formWidgets.length == _currentStep) {
+          Navigator.pop(context);
+        } else {
+          setState(() {});
+        }
       }
     }
   }
 
   void onBack() {
-    if (_currentStep == 0) {
-      Navigator.pop(context);
-    } else {
-      setState(() {
-        _currentStep -= 1;
-      });
-    }
+    //if (_currentStep == 0) {
+    Navigator.pop(context);
+    //} else {
+    //  setState(() {
+    //    _currentStep -= 1;
+    //  });
+    //}
   }
 
   onBottomBarAction(value) {
