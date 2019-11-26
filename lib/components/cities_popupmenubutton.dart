@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tracking_collections/models/city.dart';
 import 'package:tracking_collections/utils/constants.dart';
 
 class CitiesPopUpMenuButton extends StatefulWidget {
@@ -10,13 +11,13 @@ class CitiesPopUpMenuButton extends StatefulWidget {
 }
 
 class _CitiesPopUpMenuButtonState extends State<CitiesPopUpMenuButton> {
-  CityEnum _current = CityEnum.Kakinada;
-  List<PopupMenuEntry<CityEnum>> buildItems(BuildContext context) {
-    List<PopupMenuEntry<CityEnum>> items = [];
-    for (int i = 0; i < CityEnum.values.length; ++i) {
-      PopupMenuItem<CityEnum> item = PopupMenuItem<CityEnum>(
-        value: CityEnum.values[i],
-        child: Text(cities[i]),
+  City _current = cities[0];
+  List<PopupMenuEntry<City>> buildItems(BuildContext context) {
+    List<PopupMenuEntry<City>> items = [];
+    for (int i = 0; i < cities.length; ++i) {
+      PopupMenuItem<City> item = PopupMenuItem<City>(
+        value: cities[i],
+        child: Text(cities[i].name),
       );
       items.add(item);
     }
@@ -25,7 +26,7 @@ class _CitiesPopUpMenuButtonState extends State<CitiesPopUpMenuButton> {
 
   @override
   Widget build(BuildContext context) {
-    return PopupMenuButton<CityEnum>(
+    return PopupMenuButton<City>(
       onSelected: (value) {
         setState(() {
           _current = value;
@@ -37,7 +38,7 @@ class _CitiesPopUpMenuButtonState extends State<CitiesPopUpMenuButton> {
         child: Row(
           children: <Widget>[
             Text(
-              cities[CityEnum.values.indexOf(_current)],
+              _current.name,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20.0,

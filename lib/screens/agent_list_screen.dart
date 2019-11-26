@@ -153,7 +153,7 @@ class _AgentListScreenState extends State<AgentListScreen> {
           builder: (context) {
             return CustomersListScreen(
               currentDurationType: widget.currentDurationType,
-              currentCity: CityEnum.values[cities.indexOf(agent.city)],
+              currentCity: CityEnum.values[0],
             );
           },
         ),

@@ -1,16 +1,3 @@
-class City {
-  int id;
-  String city;
-}
-
-class Agent {
-  int id;
-  String name;
-  String number;
-  int city;
-  int durationType;
-}
-
 class CustomerBasicDetails {
   int id;
   String photo;

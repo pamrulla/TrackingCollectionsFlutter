@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tracking_collections/components/custom_text_from_field.dart';
 import 'package:tracking_collections/components/myRaisedButton.dart';
+import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/screens/main_screen.dart';
 import 'package:tracking_collections/utils/utils.dart';
 
@@ -26,6 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     _textEditingControllerPassword.clear();
     _textEditingControllerUserName.clear();
+    DBManager.instance.getCitiesList();
   }
 
   @override

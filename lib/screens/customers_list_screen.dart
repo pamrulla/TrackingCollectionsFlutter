@@ -60,7 +60,7 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
     String subTitle =
         durations[DurationEnum.values.indexOf(widget.currentDurationType)];
     subTitle += ":";
-    subTitle += cities[CityEnum.values.indexOf(widget.currentCity)];
+    subTitle += cities[CityEnum.values.indexOf(widget.currentCity)].name;
 
     return Scaffold(
       appBar: AppBar(
