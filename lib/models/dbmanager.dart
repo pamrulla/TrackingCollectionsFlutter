@@ -7,6 +7,7 @@ import 'package:path/path.dart' as fpath;
 import 'package:tracking_collections/models/agent.dart';
 import 'package:tracking_collections/models/basic_details.dart';
 import 'package:tracking_collections/models/city.dart';
+import 'package:tracking_collections/models/documents.dart';
 import 'package:tracking_collections/models/lending_info.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/utils.dart';
@@ -16,6 +17,7 @@ class DBManager {
   final String agentCollection = 'Agent';
   final String basicDetailsCollection = 'BasicDetails';
   final String lendingInfoCollection = 'LendingInfo';
+  final String documentsCollection = 'Documents';
 
   DBManager._privateConstructor();
   static DBManager instance = DBManager._privateConstructor();
@@ -113,6 +115,36 @@ class DBManager {
     } else {
       DocumentReference doc = await Firestore.instance
           .collection(lendingInfoCollection)
+          .add(data.toMap());
+
+      if (doc == null) {
+        return false;
+      } else {
+        data.id = doc.documentID;
+        return true;
+      }
+    }
+  }
+
+  Future<bool> updateDocuments(Documents data) async {
+    if (data.id == null || data.id.isEmpty) {
+      return await addDocuments(data);
+    } else {
+      await Firestore.instance
+          .collection(documentsCollection)
+          .document(data.id)
+          .setData(data.toMap());
+      return true;
+    }
+  }
+
+  Future<bool> addDocuments(Documents data) async {
+    if (data.id != null && data.id.isNotEmpty) {
+      await updateDocuments(data);
+      return true;
+    } else {
+      DocumentReference doc = await Firestore.instance
+          .collection(documentsCollection)
           .add(data.toMap());
 
       if (doc == null) {

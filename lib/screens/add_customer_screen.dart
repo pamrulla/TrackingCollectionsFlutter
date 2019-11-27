@@ -9,6 +9,7 @@ import 'package:tracking_collections/components/loading_please_wait.dart';
 import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/models/basic_details.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
+import 'package:tracking_collections/models/documents.dart';
 import 'package:tracking_collections/models/lending_info.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/utils.dart';
@@ -37,6 +38,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
 
   BasicDetails _basicDetails = BasicDetails();
   LendingInfo _lendingInfo = LendingInfo();
+  Documents _documents = Documents();
 
   @override
   void initState() {
@@ -61,6 +63,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       formKey: keys[2],
       onBack: onBack,
       onContinue: onContinue,
+      data: _documents,
     ));
     _formWidgets.add(CustomerBasicDetailsForm(
       formKey: keys[3],
@@ -113,18 +116,25 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     });
   }
 
+  Future<String> uploadAndGetUrl(String path) async {
+    String url = await DBManager.instance.uploadFileAndGetUrl(path);
+    if (url == null || url.isEmpty) {
+      return '';
+    }
+    Utils.deleteFile(_basicDetails.photo);
+    return url;
+  }
+
   Future<bool> processBasicDetails() async {
     if (_basicDetails.photo == null || _basicDetails.photo.isEmpty) {
       Utils.showErrorSnackBar(globalKey,
           text: 'Photo of customer should not be empty...');
       return false;
     }
-    String url =
-        await DBManager.instance.uploadFileAndGetUrl(_basicDetails.photo);
+    String url = await uploadAndGetUrl(_basicDetails.photo);
     if (url.isEmpty) {
       return false;
     }
-    Utils.deleteFile(_basicDetails.photo);
     _basicDetails.photo = url;
     return await DBManager.instance.addBasicDetails(_basicDetails);
   }
@@ -133,6 +143,24 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     _lendingInfo.customer = _basicDetails.id;
     _lendingInfo.durationType = DurationEnum.values.indexOf(widget.currentMode);
     return await DBManager.instance.addLendingInfo(_lendingInfo);
+  }
+
+  Future<bool> processDocumentDetails() async {
+    if (_documents.documentProofs.length > 0 &&
+        _documents.documentNames.length > 0 &&
+        _documents.documentNames.length == _documents.documentProofs.length) {
+      for (int i = 0; i < _documents.documentProofs.length; ++i) {
+        String url = await uploadAndGetUrl(_documents.documentProofs[i]);
+        if (url.isEmpty) {
+          return false;
+        }
+        _documents.documentProofs[i] = url;
+      }
+      _documents.customer = _basicDetails.id;
+      return await DBManager.instance.addDocuments(_documents);
+    } else {
+      return false;
+    }
   }
 
   void onContinue() async {
@@ -145,6 +173,9 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
         checkProcessStatus(isSuccess);
       } else if (_currentStep == 1) {
         isSuccess = await processLendingInfo();
+        checkProcessStatus(isSuccess);
+      } else if (_currentStep == 2) {
+        isSuccess = await processDocumentDetails();
         checkProcessStatus(isSuccess);
       }
     }
