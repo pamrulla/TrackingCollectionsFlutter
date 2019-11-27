@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tracking_collections/components/add_circle_button.dart';
 import 'package:tracking_collections/components/custom_text_from_field.dart';
+import 'package:tracking_collections/components/remove_circle_button.dart';
 import 'package:tracking_collections/models/basic_details.dart';
 import 'package:tracking_collections/utils/utils.dart';
 
@@ -42,8 +44,8 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
   FocusNode _focusNodeTemporaryAddress = FocusNode();
   TextEditingController _textEditingControllerTemporaryAddress =
       TextEditingController();
-  FocusNode _focusNodePhone = FocusNode();
-  TextEditingController _textEditingControllerPhone = TextEditingController();
+  List<FocusNode> _focusNodePhone = [];
+  List<TextEditingController> _textEditingControllerPhone = [];
 
   File _image = null;
 
@@ -51,6 +53,8 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
   void initState() {
     super.initState();
     _formKey = widget.formKey;
+    _focusNodePhone.add(FocusNode());
+    _textEditingControllerPhone.add(TextEditingController());
   }
 
   void takePhoto() async {
@@ -74,6 +78,77 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
       width: 200,
       height: 200,
     );
+  }
+
+  void addNewPhoneNumber() {
+    _focusNodePhone.add(FocusNode());
+    _textEditingControllerPhone.add(TextEditingController());
+    setState(() {});
+  }
+
+  Widget getAddRemoveButton(int index) {
+    if (index == _focusNodePhone.length - 1) {
+      return AddCircleButton(
+        onPressed: addNewPhoneNumber,
+      );
+    } else {
+      return RemoveCircleButton(
+        index: index,
+        onPressed: removePhoneNumber,
+      );
+    }
+  }
+
+  void removePhoneNumber(int index) {
+    _focusNodePhone.removeAt(index);
+    _textEditingControllerPhone.removeAt(index);
+    widget.data.phone.removeAt(index);
+    setState(() {});
+  }
+
+  List<Widget> getPhoneNumberWidgets() {
+    List<Widget> items = [];
+    for (int i = 0; i < _focusNodePhone.length; ++i) {
+      Row r1 = Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Expanded(
+            flex: 5,
+            child: CustomTextFromField(
+              focusNode: _focusNodePhone[i],
+              icon: Icons.verified_user,
+              hintText: 'Phone Number',
+              validator: (value) {
+                if (value.isEmpty || !Utils.isNumeric(value)) {
+                  return 'Phone Number should not be empty';
+                }
+                return null;
+              },
+              controller: _textEditingControllerPhone[i],
+              onSaved: (val) {
+                widget.data.phone.add(val);
+              },
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.number,
+              onFieldSubmitted: (term) {
+                if (i == _focusNodePhone.length - 1) {
+                  Utils.closeKeyboard(context);
+                } else {
+                  Utils.fieldFocusChange(
+                      context, _focusNodePhone[i], _focusNodePhone[i + 1]);
+                }
+              },
+            ),
+          ),
+          Expanded(
+            child: getAddRemoveButton(i),
+          ),
+        ],
+      );
+      items.add(r1);
+    }
+    return items;
   }
 
   Widget buildBasicDetails() {
@@ -163,26 +238,7 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
             keyboardType: TextInputType.number,
             onFieldSubmitted: (term) {
               Utils.fieldFocusChange(
-                  context, _focusNodeAdharNumber, _focusNodePhone);
-            },
-          ),
-          CustomTextFromField(
-            focusNode: _focusNodePhone,
-            icon: Icons.verified_user,
-            hintText: 'Phone Number',
-            validator: (value) {
-              if (value.isEmpty || !Utils.isNumeric(value)) {
-                return 'Phone Number should not be empty';
-              }
-              return null;
-            },
-            controller: _textEditingControllerPhone,
-            onSaved: (val) {},
-            textInputAction: TextInputAction.next,
-            keyboardType: TextInputType.number,
-            onFieldSubmitted: (term) {
-              Utils.fieldFocusChange(
-                  context, _focusNodePhone, _focusNodePermanentAddress);
+                  context, _focusNodeAdharNumber, _focusNodePermanentAddress);
             },
           ),
           CheckboxListTile(
@@ -214,7 +270,8 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
                 : TextInputAction.next,
             onFieldSubmitted: (term) {
               if (_sameAsPermanentAddress) {
-                Utils.closeKeyboard(context);
+                Utils.fieldFocusChange(
+                    context, _focusNodePermanentAddress, _focusNodePhone[0]);
               } else {
                 Utils.fieldFocusChange(context, _focusNodePermanentAddress,
                     _focusNodeTemporaryAddress);
@@ -237,9 +294,13 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
             },
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (term) {
-              Utils.closeKeyboard(context);
+              Utils.fieldFocusChange(
+                  context, _focusNodeTemporaryAddress, _focusNodePhone[0]);
             },
             enabled: !_sameAsPermanentAddress,
+          ),
+          Column(
+            children: getPhoneNumberWidgets(),
           ),
         ],
       ),

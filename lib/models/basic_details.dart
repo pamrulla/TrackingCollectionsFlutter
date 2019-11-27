@@ -10,6 +10,7 @@ class BasicDetails {
   bool isSameAsPermanentAddress;
   String permanentAddress;
   String temporaryAddress;
+  List<String> phone = [];
 
   BasicDetails() {
     isSameAsPermanentAddress = false;
@@ -25,6 +26,7 @@ class BasicDetails {
       'isSameAsPermanentAddress': isSameAsPermanentAddress,
       'permanentAddress': permanentAddress,
       'temporaryAddress': temporaryAddress,
+      'phone': phone,
     };
   }
 
@@ -38,6 +40,7 @@ class BasicDetails {
     isSameAsPermanentAddress = map['isSameAsPermanentAddress'];
     permanentAddress = map['permanentAddress'];
     temporaryAddress = map['temporaryAddress'];
+    print(map['phone']);
   }
 
   void fromDocument(DocumentSnapshot map) {
@@ -50,5 +53,6 @@ class BasicDetails {
     isSameAsPermanentAddress = map['isSameAsPermanentAddress'];
     permanentAddress = map['permanentAddress'];
     temporaryAddress = map['temporaryAddress'];
+    print(map['phone']);
   }
 }
