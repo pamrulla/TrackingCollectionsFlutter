@@ -31,22 +31,28 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     "Add Basic Details",
     "Add Lending Info",
     "Documents",
-    "Security: Basic Details",
-    "Security: Documents"
+    "Security 1: Basic Details",
+    "Security 1: Documents"
   ];
   List<GlobalKey<FormState>> keys = [];
 
   BasicDetails _basicDetails = BasicDetails();
   LendingInfo _lendingInfo = LendingInfo();
   Documents _documents = Documents();
+  List<BasicDetails> _securities = [];
+  List<Documents> _securitiesDocs = [];
 
   @override
   void initState() {
     super.initState();
     _lendingInfo.city = cities[0].id;
+    _securities.add(BasicDetails());
+    _securitiesDocs.add(Documents());
+
     for (int i = 0; i < _subTitles.length; ++i) {
       keys.add(GlobalKey<FormState>());
     }
+
     _formWidgets.add(CustomerBasicDetailsForm(
       formKey: keys[0],
       onBack: onBack,
@@ -69,12 +75,13 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       formKey: keys[3],
       onBack: onBack,
       onContinue: onContinue,
-      data: _basicDetails,
+      data: _securities[0],
     ));
     _formWidgets.add(CustomerDocumentForm(
       formKey: keys[4],
       onBack: onBack,
       onContinue: onContinue,
+      data: _securitiesDocs[0],
     ));
   }
 
@@ -163,6 +170,41 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     }
   }
 
+  Future<bool> processSecurityBasicDetails() async {
+    if (_securities[0].photo == null || _securities[0].photo.isEmpty) {
+      Utils.showErrorSnackBar(globalKey,
+          text: 'Photo of customer should not be empty...');
+      return false;
+    }
+    String url = await uploadAndGetUrl(_securities[0].photo);
+    if (url.isEmpty) {
+      return false;
+    }
+    _securities[0].photo = url;
+    _securities[0].customer = _basicDetails.id;
+    return await DBManager.instance.addBasicDetails(_securities[0]);
+  }
+
+  Future<bool> processSecurityDocumentDetails() async {
+    if (_securitiesDocs[0].documentProofs.length > 0 &&
+        _securitiesDocs[0].documentNames.length > 0 &&
+        _securitiesDocs[0].documentNames.length ==
+            _securitiesDocs[0].documentProofs.length) {
+      for (int i = 0; i < _securitiesDocs[0].documentProofs.length; ++i) {
+        String url =
+            await uploadAndGetUrl(_securitiesDocs[0].documentProofs[i]);
+        if (url.isEmpty) {
+          return false;
+        }
+        _securitiesDocs[0].documentProofs[i] = url;
+      }
+      _securitiesDocs[0].customer = _securities[0].id;
+      return await DBManager.instance.addDocuments(_securitiesDocs[0]);
+    } else {
+      return false;
+    }
+  }
+
   void onContinue() async {
     if (keys[_currentStep].currentState.validate()) {
       keys[_currentStep].currentState.save();
@@ -176,6 +218,12 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
         checkProcessStatus(isSuccess);
       } else if (_currentStep == 2) {
         isSuccess = await processDocumentDetails();
+        checkProcessStatus(isSuccess);
+      } else if (_currentStep == 3) {
+        isSuccess = await processSecurityBasicDetails();
+        checkProcessStatus(isSuccess);
+      } else if (_currentStep == 4) {
+        isSuccess = await processSecurityDocumentDetails();
         checkProcessStatus(isSuccess);
       }
     }

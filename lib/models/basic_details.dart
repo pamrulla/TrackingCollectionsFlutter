@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BasicDetails {
   String id;
+  String customer;
   String photo;
   String name;
   String occupation;
@@ -14,12 +15,14 @@ class BasicDetails {
 
   BasicDetails() {
     isSameAsPermanentAddress = false;
+    customer = '';
   }
 
   Map<String, dynamic> toMap() {
     return {
       'photo': photo,
       'name': name,
+      'customer': customer,
       'occupation': occupation,
       'fatherName': fatherName,
       'adharNumber': adharNumber,
