@@ -7,6 +7,7 @@ import 'package:path/path.dart' as fpath;
 import 'package:tracking_collections/models/agent.dart';
 import 'package:tracking_collections/models/basic_details.dart';
 import 'package:tracking_collections/models/city.dart';
+import 'package:tracking_collections/models/lending_info.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/utils.dart';
 
@@ -14,6 +15,7 @@ class DBManager {
   final String cityCollection = 'City';
   final String agentCollection = 'Agent';
   final String basicDetailsCollection = 'BasicDetails';
+  final String lendingInfoCollection = 'LendingInfo';
 
   DBManager._privateConstructor();
   static DBManager instance = DBManager._privateConstructor();
@@ -33,24 +35,14 @@ class DBManager {
   }
 
   Future<bool> addAgent(Agent agent) async {
+    print('Just Inside');
     DocumentReference doc =
         await Firestore.instance.collection(agentCollection).add(agent.toMap());
+    print('Just Inside After');
     if (doc == null) {
       return false;
     } else {
       agent.id = doc.documentID;
-      return true;
-    }
-  }
-
-  Future<bool> updateBasicDetails(BasicDetails basicDetails) async {
-    if (basicDetails.id != null && basicDetails.id.isNotEmpty) {
-      return await addBasicDetails(basicDetails);
-    } else {
-      await Firestore.instance
-          .collection(basicDetailsCollection)
-          .document(basicDetails.id)
-          .setData(basicDetails.toMap());
       return true;
     }
   }
@@ -72,8 +64,20 @@ class DBManager {
     return url;
   }
 
-  Future<bool> addBasicDetails(BasicDetails basicDetails) async {
+  Future<bool> updateBasicDetails(BasicDetails basicDetails) async {
     if (basicDetails.id == null || basicDetails.id.isEmpty) {
+      return await addBasicDetails(basicDetails);
+    } else {
+      await Firestore.instance
+          .collection(basicDetailsCollection)
+          .document(basicDetails.id)
+          .setData(basicDetails.toMap());
+      return true;
+    }
+  }
+
+  Future<bool> addBasicDetails(BasicDetails basicDetails) async {
+    if (basicDetails.id != null && basicDetails.id.isNotEmpty) {
       await updateBasicDetails(basicDetails);
       return true;
     } else {
@@ -85,6 +89,36 @@ class DBManager {
         return false;
       } else {
         basicDetails.id = doc.documentID;
+        return true;
+      }
+    }
+  }
+
+  Future<bool> updateLendingInfo(LendingInfo data) async {
+    if (data.id == null || data.id.isEmpty) {
+      return await addLendingInfo(data);
+    } else {
+      await Firestore.instance
+          .collection(lendingInfoCollection)
+          .document(data.id)
+          .setData(data.toMap());
+      return true;
+    }
+  }
+
+  Future<bool> addLendingInfo(LendingInfo data) async {
+    if (data.id != null && data.id.isNotEmpty) {
+      await updateLendingInfo(data);
+      return true;
+    } else {
+      DocumentReference doc = await Firestore.instance
+          .collection(lendingInfoCollection)
+          .add(data.toMap());
+
+      if (doc == null) {
+        return false;
+      } else {
+        data.id = doc.documentID;
         return true;
       }
     }

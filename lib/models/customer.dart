@@ -1,20 +1,3 @@
-class CustomerPhoneNumber {
-  int id;
-  int customer;
-  String number;
-}
-
-class CustomerLendingInfo {
-  int id;
-  int customer;
-  int durationType;
-  int city;
-  String date;
-  double amount;
-  int months;
-  double interestRate;
-}
-
 class CustomerDocument {
   int id;
   int customer;

@@ -9,6 +9,7 @@ import 'package:tracking_collections/components/loading_please_wait.dart';
 import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/models/basic_details.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
+import 'package:tracking_collections/models/lending_info.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/utils.dart';
 
@@ -35,10 +36,12 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
   List<GlobalKey<FormState>> keys = [];
 
   BasicDetails _basicDetails = BasicDetails();
+  LendingInfo _lendingInfo = LendingInfo();
 
   @override
   void initState() {
     super.initState();
+    _lendingInfo.city = cities[0].id;
     for (int i = 0; i < _subTitles.length; ++i) {
       keys.add(GlobalKey<FormState>());
     }
@@ -52,6 +55,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       formKey: keys[1],
       onBack: onBack,
       onContinue: onContinue,
+      data: _lendingInfo,
     ));
     _formWidgets.add(CustomerDocumentForm(
       formKey: keys[2],
@@ -109,7 +113,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     });
   }
 
-  Future<bool> addBasicDetails() async {
+  Future<bool> processBasicDetails() async {
     if (_basicDetails.photo == null || _basicDetails.photo.isEmpty) {
       Utils.showErrorSnackBar(globalKey,
           text: 'Photo of customer should not be empty...');
@@ -125,23 +129,36 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     return await DBManager.instance.addBasicDetails(_basicDetails);
   }
 
+  Future<bool> processLendingInfo() async {
+    _lendingInfo.customer = _basicDetails.id;
+    _lendingInfo.durationType = DurationEnum.values.indexOf(widget.currentMode);
+    return await DBManager.instance.addLendingInfo(_lendingInfo);
+  }
+
   void onContinue() async {
     if (keys[_currentStep].currentState.validate()) {
       keys[_currentStep].currentState.save();
       bool isSuccess = false;
       displayLoading(true);
       if (_currentStep == 0) {
-        isSuccess = await addBasicDetails();
+        isSuccess = await processBasicDetails();
+        checkProcessStatus(isSuccess);
+      } else if (_currentStep == 1) {
+        isSuccess = await processLendingInfo();
+        checkProcessStatus(isSuccess);
       }
-      displayLoading(false);
-      if (isSuccess == true) {
-        Utils.showSuccessSnackBar(globalKey);
-        _currentStep += 1;
-        if (_formWidgets.length == _currentStep) {
-          Navigator.pop(context);
-        } else {
-          setState(() {});
-        }
+    }
+  }
+
+  void checkProcessStatus(bool isSuccess) {
+    displayLoading(false);
+    if (isSuccess == true) {
+      Utils.showSuccessSnackBar(globalKey);
+      _currentStep += 1;
+      if (_formWidgets.length == _currentStep) {
+        Navigator.pop(context);
+      } else {
+        setState(() {});
       }
     }
   }

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
 import 'package:tracking_collections/components/bottom_navigation_bar.dart';
-import 'package:tracking_collections/components/cities_popupmenubutton.dart';
 import 'package:tracking_collections/components/custom_text_from_field.dart';
 import 'package:tracking_collections/components/form_sub_heading_text.dart';
 import 'package:tracking_collections/components/goto_home_widget.dart';
 import 'package:tracking_collections/components/loading_please_wait.dart';
 import 'package:tracking_collections/components/logout_widget.dart';
+import 'package:tracking_collections/components/show_select_city.dart';
 import 'package:tracking_collections/models/agent.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/screens/add_customer_screen.dart';
@@ -109,21 +109,10 @@ class _NewLineScreenState extends State<NewLineScreen> {
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      children: <Widget>[
-                                        Expanded(
-                                          child: FormSubHeadingText(
-                                            text: 'Select City:',
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: CitiesPopUpMenuButton(
-                                            onSelected: (value) {
-                                              agent.city = value.id;
-                                            },
-                                          ),
-                                        )
-                                      ],
+                                    child: ShowSelectCity(
+                                      onSelected: (value) {
+                                        agent.city = value.id;
+                                      },
                                     ),
                                   ),
                                   Padding(
@@ -276,7 +265,9 @@ class _NewLineScreenState extends State<NewLineScreen> {
       displayLoading(true);
       if (_formKey.currentState.validate()) {
         _formKey.currentState.save();
+        print('Just Before');
         bool isSuccess = await DBManager.instance.addAgent(agent);
+        print('Just After');
         displayLoading(false);
         if (isSuccess) {
           await onSuccess();

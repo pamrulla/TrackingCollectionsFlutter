@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:tracking_collections/components/custom_text_from_field.dart';
+import 'package:tracking_collections/components/show_select_city.dart';
+import 'package:tracking_collections/models/lending_info.dart';
 import 'package:tracking_collections/utils/utils.dart';
 
 class CustomerLendingInfoForm extends StatefulWidget {
   final Function onContinue;
   final Function onBack;
+  final LendingInfo data;
   GlobalKey<FormState> formKey;
-  CustomerLendingInfoForm(
-      {@required this.formKey,
-      @required this.onContinue,
-      @required this.onBack});
+  CustomerLendingInfoForm({
+    @required this.formKey,
+    @required this.onContinue,
+    @required this.onBack,
+    @required this.data,
+  });
 
   @override
   _CustomerLendingInfoFormState createState() =>
@@ -40,6 +45,14 @@ class _CustomerLendingInfoFormState extends State<CustomerLendingInfoForm> {
       key: _formKey,
       child: Column(
         children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
+            child: ShowSelectCity(
+              onSelected: (value) {
+                widget.data.city = value.id;
+              },
+            ),
+          ),
           CustomTextFromField(
             focusNode: _focusNodeDate,
             icon: Icons.verified_user,
@@ -51,7 +64,9 @@ class _CustomerLendingInfoFormState extends State<CustomerLendingInfoForm> {
               return null;
             },
             controller: _textEditingControllerDate,
-            onSaved: (val) {},
+            onSaved: (val) {
+              widget.data.date = val;
+            },
             textInputAction: TextInputAction.next,
             onFieldSubmitted: (term) {
               Utils.fieldFocusChange(context, _focusNodeDate, _focusNodeAmount);
@@ -65,13 +80,15 @@ class _CustomerLendingInfoFormState extends State<CustomerLendingInfoForm> {
             validator: (value) {
               if (value.isEmpty) {
                 return 'Lending Amount should not be empty';
-              } else if (Utils.isNumeric(value)) {
+              } else if (!Utils.isNumeric(value)) {
                 return 'Lending Amount is invalid';
               }
               return null;
             },
             controller: _textEditingControllerAmount,
-            onSaved: (val) {},
+            onSaved: (val) {
+              widget.data.amount = double.parse(val);
+            },
             textInputAction: TextInputAction.next,
             onFieldSubmitted: (term) {
               Utils.fieldFocusChange(
@@ -86,13 +103,15 @@ class _CustomerLendingInfoFormState extends State<CustomerLendingInfoForm> {
             validator: (value) {
               if (value.isEmpty) {
                 return 'Months should not be empty';
-              } else if (Utils.isNumeric(value)) {
+              } else if (!Utils.isNumeric(value)) {
                 return 'Months is invalid';
               }
               return null;
             },
             controller: _textEditingControllerMonths,
-            onSaved: (val) {},
+            onSaved: (val) {
+              widget.data.months = int.parse(val);
+            },
             textInputAction: TextInputAction.next,
             onFieldSubmitted: (term) {
               Utils.fieldFocusChange(
@@ -107,13 +126,15 @@ class _CustomerLendingInfoFormState extends State<CustomerLendingInfoForm> {
             validator: (value) {
               if (value.isEmpty) {
                 return 'Interest Rate should not be empty';
-              } else if (Utils.isNumeric(value)) {
+              } else if (!Utils.isNumeric(value)) {
                 return 'Interest Rate is invalid';
               }
               return null;
             },
             controller: _textEditingControllerInterestRate,
-            onSaved: (val) {},
+            onSaved: (val) {
+              widget.data.interestRate = double.parse(val);
+            },
             textInputAction: TextInputAction.next,
             onFieldSubmitted: (term) {
               Utils.closeKeyboard(context);
