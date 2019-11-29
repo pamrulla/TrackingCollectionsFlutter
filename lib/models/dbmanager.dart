@@ -211,4 +211,31 @@ class DBManager {
 
     return item;
   }
+
+  Future<List<CustomerBasicDetails>> getSecurityDetails(String id) async {
+    List<CustomerBasicDetails> items = [];
+    QuerySnapshot bd = await Firestore.instance
+        .collection(basicDetailsCollection)
+        .where('customer', isEqualTo: id)
+        .getDocuments();
+    if (bd == null || bd.documents.length == 0) {
+      return null;
+    }
+    for (int i = 0; i < bd.documents.length; ++i) {
+      DocumentSnapshot ds = bd.documents[i];
+      CustomerBasicDetails cbd = CustomerBasicDetails();
+      cbd.basicDetails.fromDocument(ds);
+      QuerySnapshot dc = await Firestore.instance
+          .collection(documentsCollection)
+          .where('customer', isEqualTo: ds.documentID)
+          .getDocuments();
+      if (dc == null || dc.documents.length > 1) {
+        return null;
+      }
+      cbd.documents.fromDocument(dc.documents[0]);
+      items.add(cbd);
+    }
+
+    return items;
+  }
 }

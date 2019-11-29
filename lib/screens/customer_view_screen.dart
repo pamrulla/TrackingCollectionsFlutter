@@ -5,7 +5,9 @@ import 'package:tracking_collections/components/loading_please_wait.dart';
 import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/models/customer.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
+import 'package:tracking_collections/models/documents.dart';
 import 'package:tracking_collections/screens/amount_recieve_bottom_screen.dart';
+import 'package:tracking_collections/screens/image_viewer_screen.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/viewmodels/CustomerBasicDetails.dart';
 
@@ -20,7 +22,8 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
     with SingleTickerProviderStateMixin {
   TabController _controller;
   final globalKey = GlobalKey<ScaffoldState>();
-  CustomerBasicDetails _customerBasicDetails;
+  Future<CustomerBasicDetails> _customerBasicDetailsFuture;
+  Future<List<CustomerBasicDetails>> _securityBasicDetailsFuture;
 
   @override
   void initState() {
@@ -28,6 +31,10 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
     super.initState();
     _controller = TabController(vsync: this, length: 4);
     _controller.addListener(_handleTabSelection);
+    _customerBasicDetailsFuture =
+        DBManager.instance.getCustomerBasicDetails(widget.id);
+    _securityBasicDetailsFuture =
+        DBManager.instance.getSecurityDetails(widget.id);
   }
 
   @override
@@ -36,7 +43,7 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
     super.dispose();
   }
 
-  Widget getBasicDetails() {
+  Widget getBasicDetails(CustomerBasicDetails cbd, {bool isMain = true}) {
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(),
       padding: EdgeInsets.only(
@@ -50,7 +57,7 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
         children: <Widget>[
           Center(
             child: Image.network(
-              _customerBasicDetails.basicDetails.photo,
+              cbd.basicDetails.photo,
               width: 100,
               height: 100,
             ),
@@ -58,80 +65,80 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
           Divider(),
           //TableRow('ID', '001'),
           //Divider(),
-          TableRow('Name', _customerBasicDetails.basicDetails.name),
+          TableRow('Name', cbd.basicDetails.name),
           Divider(),
-          TableRow('Duration',
-              durations[_customerBasicDetails.lendingInfo.durationType]),
+          TableRow('Father Name', cbd.basicDetails.fatherName),
           Divider(),
-          TableRow(
-              'Amount', _customerBasicDetails.lendingInfo.amount.toString()),
+          isMain
+              ? TableRow('Duration', durations[cbd.lendingInfo.durationType])
+              : Container(),
+          isMain ? Divider() : Container(),
+          isMain
+              ? TableRow('Amount', cbd.lendingInfo.amount.toString())
+              : Container(),
+          isMain ? Divider() : Container(),
+          isMain
+              ? TableRow(
+                  'InterestRate', cbd.lendingInfo.interestRate.toString())
+              : Container(),
+          isMain ? Divider() : Container(),
+          isMain
+              ? TableRow('Months', cbd.lendingInfo.months.toString())
+              : Container(),
+          isMain ? Divider() : Container(),
+          Column(
+            children: getPhoneNumbers(cbd.basicDetails.phone),
+          ),
+          TableRow('Permanent Address', cbd.basicDetails.permanentAddress),
           Divider(),
-          TableRow('InterestRate',
-              _customerBasicDetails.lendingInfo.interestRate.toString()),
-          Divider(),
-          TableRow(
-              'Months', _customerBasicDetails.lendingInfo.months.toString()),
-          Divider(),
-          TableRow('Phone', _customerBasicDetails.basicDetails.phone[0]),
-          Divider(),
-          TableRow('Permanent Address',
-              _customerBasicDetails.basicDetails.permanentAddress),
-          Divider(),
-          TableRow('Temporary Address',
-              _customerBasicDetails.basicDetails.temporaryAddress),
+          TableRow('Temporary Address', cbd.basicDetails.temporaryAddress),
           Divider(),
           TableRow('Documents Submitted', ''),
           Divider(),
           Column(
-            children: getDocumentsInfo(),
+            children: getDocumentsInfo(cbd.documents),
           ),
         ],
       ),
     );
   }
 
-  List<Widget> getDocumentsInfo() {
+  List<Widget> getPhoneNumbers(List<String> phones) {
     List<Widget> items = [];
-    for (int i = 0;
-        i < _customerBasicDetails.documents.documentNames.length;
-        ++i) {
-      items.add(TableRow(_customerBasicDetails.documents.documentNames[i],
-          _customerBasicDetails.documents.documentProofs[i]));
+    for (int i = 0; i < phones.length; ++i) {
+      items.add(TableRow(
+        'Phone ' + (i + 1).toString(),
+        phones[i],
+      ));
       items.add(Divider());
     }
     return items;
   }
 
-  Widget getSingleSecurityDetails() {
-    return Column(
-      children: <Widget>[
-        Center(
-          child: Image.asset(
-            'images/profile.jpg',
-            width: 100,
-            height: 100,
-          ),
-        ),
-        Divider(),
-        TableRow('Name', 'Ravi'),
-        Divider(),
-        TableRow('Phone', '1234567890'),
-        Divider(),
-        TableRow('Permanent Address', 'Kakinada'),
-        Divider(),
-        TableRow('Temporary Address', 'Rajahmundry'),
-        Divider(),
-        TableRow('Documents Submitted', ''),
-        Divider(),
-        TableRow('Adhar', 'Link'),
-        Divider(),
-        TableRow('Pan Crd', 'Link'),
-        Divider(),
-      ],
-    );
+  List<Widget> getDocumentsInfo(Documents dc) {
+    List<Widget> items = [];
+    for (int i = 0; i < dc.documentNames.length; ++i) {
+      items.add(TableRow(
+        dc.documentNames[i],
+        'View',
+        isImageView: true,
+        url: dc.documentProofs[i],
+      ));
+      items.add(Divider());
+    }
+    return items;
   }
 
-  Widget getSecurityDetails() {
+  List<Widget> getSecurityDetailsList(
+      List<CustomerBasicDetails> _securityBasicDetails) {
+    List<Widget> items = [];
+    for (int i = 0; i < _securityBasicDetails.length; ++i) {
+      items.add(getBasicDetails(_securityBasicDetails[i], isMain: false));
+    }
+    return items;
+  }
+
+  Widget getSecurityDetails(List<CustomerBasicDetails> _securityBasicDetails) {
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(),
       padding: EdgeInsets.only(
@@ -142,10 +149,7 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          getSingleSecurityDetails(),
-          getSingleSecurityDetails(),
-        ],
+        children: getSecurityDetailsList(_securityBasicDetails),
       ),
     );
   }
@@ -293,6 +297,7 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
       return FloatingActionButton(
         onPressed: () {
           viewDurationBottomSheet(context);
+          setState(() {});
         },
         child: Icon(Icons.add),
         backgroundColor: Theme.of(context).accentColor,
@@ -341,11 +346,11 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
         controller: _controller,
         children: [
           FutureBuilder(
-            future: DBManager.instance.getCustomerBasicDetails(widget.id),
+            future: _customerBasicDetailsFuture,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                _customerBasicDetails = snapshot.data;
-                return Container(child: getBasicDetails());
+                CustomerBasicDetails _customerBasicDetails = snapshot.data;
+                return Container(child: getBasicDetails(_customerBasicDetails));
               } else {
                 return LoadingPleaseWait();
               }
@@ -353,7 +358,19 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
           ),
           Container(child: getPaymentDetails()),
           Container(child: getPenaltyDetails()),
-          Container(child: getSecurityDetails()),
+          FutureBuilder(
+            future: _securityBasicDetailsFuture,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                List<CustomerBasicDetails> _securityBasicDetails =
+                    snapshot.data;
+                return Container(
+                    child: getSecurityDetails(_securityBasicDetails));
+              } else {
+                return LoadingPleaseWait();
+              }
+            },
+          ),
         ],
       ),
     );
@@ -394,17 +411,38 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
 class TableValue extends StatelessWidget {
   final String text;
   final bool isAmount;
-  const TableValue({@required this.text, this.isAmount = false});
+  final bool isImageView;
+  final String url;
+  final String title;
+  const TableValue(
+      {@required this.text,
+      this.isAmount = false,
+      this.isImageView = false,
+      this.url = '',
+      this.title = ''});
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: 20.0,
-        fontWeight: FontWeight.normal,
+    return GestureDetector(
+      onTap: () {
+        if (isImageView) {
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+            return ImageViewer(
+              url,
+              title: title,
+            );
+          }));
+        }
+      },
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 20.0,
+          fontWeight: FontWeight.normal,
+          color: isImageView ? Colors.blueAccent : Colors.black,
+        ),
+        textAlign: isAmount ? TextAlign.right : TextAlign.left,
       ),
-      textAlign: isAmount ? TextAlign.right : TextAlign.left,
     );
   }
 }
@@ -430,7 +468,10 @@ class TableRow extends StatelessWidget {
   final String header;
   final String value;
   final bool isAmount;
-  TableRow(this.header, this.value, {this.isAmount = false});
+  final bool isImageView;
+  final String url;
+  TableRow(this.header, this.value,
+      {this.isAmount = false, this.isImageView = false, this.url = ''});
 
   @override
   Widget build(BuildContext context) {
@@ -444,6 +485,9 @@ class TableRow extends StatelessWidget {
                   child: TableValue(
                   text: value,
                   isAmount: isAmount,
+                  isImageView: isImageView,
+                  url: url,
+                  title: header,
                 ))
               : Container(),
         ],
