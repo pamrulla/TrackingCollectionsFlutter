@@ -56,6 +56,9 @@ class BasicDetails {
     isSameAsPermanentAddress = map['isSameAsPermanentAddress'];
     permanentAddress = map['permanentAddress'];
     temporaryAddress = map['temporaryAddress'];
-    print(map['phone']);
+    map['phone'].forEach((d) {
+      phone.add(d);
+    });
+    //phone = map['phone'];
   }
 }

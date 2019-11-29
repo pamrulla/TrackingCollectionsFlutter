@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
 import 'package:tracking_collections/components/goto_home_widget.dart';
+import 'package:tracking_collections/components/loading_please_wait.dart';
 import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/models/customer.dart';
+import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/screens/amount_recieve_bottom_screen.dart';
+import 'package:tracking_collections/utils/constants.dart';
+import 'package:tracking_collections/viewmodels/CustomerBasicDetails.dart';
 
 class CustomerViewScreen extends StatefulWidget {
+  final String id;
+  CustomerViewScreen(String _id) : id = _id;
   @override
   _CustomerViewScreenState createState() => _CustomerViewScreenState();
 }
@@ -14,9 +20,11 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
     with SingleTickerProviderStateMixin {
   TabController _controller;
   final globalKey = GlobalKey<ScaffoldState>();
+  CustomerBasicDetails _customerBasicDetails;
 
   @override
   void initState() {
+    print(widget.id);
     super.initState();
     _controller = TabController(vsync: this, length: 4);
     _controller.addListener(_handleTabSelection);
@@ -41,40 +49,57 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Center(
-            child: Image.asset(
-              'images/profile.jpg',
+            child: Image.network(
+              _customerBasicDetails.basicDetails.photo,
               width: 100,
               height: 100,
             ),
           ),
           Divider(),
-          TableRow('ID', '001'),
+          //TableRow('ID', '001'),
+          //Divider(),
+          TableRow('Name', _customerBasicDetails.basicDetails.name),
           Divider(),
-          TableRow('Name', 'Ravi'),
+          TableRow('Duration',
+              durations[_customerBasicDetails.lendingInfo.durationType]),
           Divider(),
-          TableRow('Duration', 'Monthly'),
+          TableRow(
+              'Amount', _customerBasicDetails.lendingInfo.amount.toString()),
           Divider(),
-          TableRow('Amount', '20000.00'),
+          TableRow('InterestRate',
+              _customerBasicDetails.lendingInfo.interestRate.toString()),
           Divider(),
-          TableRow('InterestRate', '3.50'),
+          TableRow(
+              'Months', _customerBasicDetails.lendingInfo.months.toString()),
           Divider(),
-          TableRow('Months', '10'),
+          TableRow('Phone', _customerBasicDetails.basicDetails.phone[0]),
           Divider(),
-          TableRow('Phone', '1234567890'),
+          TableRow('Permanent Address',
+              _customerBasicDetails.basicDetails.permanentAddress),
           Divider(),
-          TableRow('Permanent Address', 'Kakinada'),
-          Divider(),
-          TableRow('Temporary Address', 'Rajahmundry'),
+          TableRow('Temporary Address',
+              _customerBasicDetails.basicDetails.temporaryAddress),
           Divider(),
           TableRow('Documents Submitted', ''),
           Divider(),
-          TableRow('Adhar', 'Link'),
-          Divider(),
-          TableRow('Pan Crd', 'Link'),
-          Divider(),
+          Column(
+            children: getDocumentsInfo(),
+          ),
         ],
       ),
     );
+  }
+
+  List<Widget> getDocumentsInfo() {
+    List<Widget> items = [];
+    for (int i = 0;
+        i < _customerBasicDetails.documents.documentNames.length;
+        ++i) {
+      items.add(TableRow(_customerBasicDetails.documents.documentNames[i],
+          _customerBasicDetails.documents.documentProofs[i]));
+      items.add(Divider());
+    }
+    return items;
   }
 
   Widget getSingleSecurityDetails() {
@@ -264,7 +289,6 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
   }
 
   Widget getFloatingActionButton() {
-    print(_controller.index);
     if (_controller.index == 1 || _controller.index == 2) {
       return FloatingActionButton(
         onPressed: () {
@@ -316,7 +340,17 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
       body: TabBarView(
         controller: _controller,
         children: [
-          Container(child: getBasicDetails()),
+          FutureBuilder(
+            future: DBManager.instance.getCustomerBasicDetails(widget.id),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                _customerBasicDetails = snapshot.data;
+                return Container(child: getBasicDetails());
+              } else {
+                return LoadingPleaseWait();
+              }
+            },
+          ),
           Container(child: getPaymentDetails()),
           Container(child: getPenaltyDetails()),
           Container(child: getSecurityDetails()),

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Documents {
   String id;
   String customer;
@@ -10,5 +12,16 @@ class Documents {
       'documentNames': documentNames,
       'documentProofs': documentProofs,
     };
+  }
+
+  void fromDocument(DocumentSnapshot document) {
+    id = document.documentID;
+    customer = document['customer'];
+    document['documentNames'].forEach((d) {
+      documentNames.add(d);
+    });
+    document['documentProofs'].forEach((d) {
+      documentProofs.add(d);
+    });
   }
 }

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class LendingInfo {
   String id;
   String customer;
@@ -18,5 +20,16 @@ class LendingInfo {
       'months': months,
       'interestRate': interestRate,
     };
+  }
+
+  void fromDocument(DocumentSnapshot map) {
+    id = map.documentID;
+    customer = map['customer'];
+    durationType = map['durationType'];
+    city = map['city'];
+    date = map['date'];
+    amount = map['amount'];
+    months = map['months'];
+    interestRate = map['interestRate'];
   }
 }
