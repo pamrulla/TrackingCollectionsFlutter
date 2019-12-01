@@ -10,10 +10,12 @@ import 'package:tracking_collections/models/basic_details.dart';
 import 'package:tracking_collections/models/city.dart';
 import 'package:tracking_collections/models/documents.dart';
 import 'package:tracking_collections/models/lending_info.dart';
+import 'package:tracking_collections/models/total_amounts.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/utils.dart';
 import 'package:tracking_collections/viewmodels/CustomerBasicDetails.dart';
 import 'package:tracking_collections/viewmodels/CustomerList.dart';
+import 'package:tracking_collections/models/transaction.dart' as my_transaction;
 
 class DBManager {
   final String cityCollection = 'City';
@@ -21,6 +23,8 @@ class DBManager {
   final String basicDetailsCollection = 'BasicDetails';
   final String lendingInfoCollection = 'LendingInfo';
   final String documentsCollection = 'Documents';
+  final String transactionsCollection = 'Transactions';
+  final String totalAmountsCollection = 'TotalAmounts';
 
   DBManager._privateConstructor();
   static DBManager instance = DBManager._privateConstructor();
@@ -237,5 +241,61 @@ class DBManager {
     }
 
     return items;
+  }
+
+  Future<bool> addTransaction(my_transaction.Transaction data) async {
+    if (data.id != null && data.id.isNotEmpty) {
+      //await updateDocuments(data);
+      return true;
+    } else {
+      DocumentReference doc = await Firestore.instance
+          .collection(transactionsCollection)
+          .add(data.toMap());
+
+      if (doc == null) {
+        return false;
+      } else {
+        data.id = doc.documentID;
+        return await updateTotalAmount(data);
+      }
+    }
+  }
+
+  Future<bool> updateTotalAmount(my_transaction.Transaction data) async {
+    QuerySnapshot docs = await Firestore.instance
+        .collection(totalAmountsCollection)
+        .where('customer', isEqualTo: data.customer)
+        .getDocuments();
+    if (docs.documents.length == 0) {
+      //Add New
+      TotalAmounts ta = TotalAmounts();
+      ta.customer = data.customer;
+      ta.totalPenalty = data.type == 0 ? 0 : data.amount;
+      ta.totalRepaid = data.type == 0 ? data.amount : 0;
+      DocumentReference doc = await Firestore.instance
+          .collection(totalAmountsCollection)
+          .add(ta.toMap());
+
+      if (doc == null) {
+        return false;
+      } else {
+        ta.id = doc.documentID;
+        return true;
+      }
+    } else {
+      //Update Existing
+      TotalAmounts ti = TotalAmounts();
+      ti.fromDocument(docs.documents[0]);
+      if (data.type == 0) {
+        ti.totalRepaid += data.amount;
+      } else {
+        ti.totalPenalty += data.amount;
+      }
+      await Firestore.instance
+          .collection(totalAmountsCollection)
+          .document(ti.id)
+          .setData(ti.toMap());
+      return true;
+    }
   }
 }

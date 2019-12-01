@@ -262,8 +262,8 @@ class _NewLineScreenState extends State<NewLineScreen> {
 
   Future<void> _onAddingAgent(int value) async {
     if (value == 1) {
-      displayLoading(true);
       if (_formKey.currentState.validate()) {
+        displayLoading(true);
         _formKey.currentState.save();
         print('Just Before');
         bool isSuccess = await DBManager.instance.addAgent(agent);

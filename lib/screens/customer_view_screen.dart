@@ -3,9 +3,9 @@ import 'package:tracking_collections/components/appbar_title_with_subtitle.dart'
 import 'package:tracking_collections/components/goto_home_widget.dart';
 import 'package:tracking_collections/components/loading_please_wait.dart';
 import 'package:tracking_collections/components/logout_widget.dart';
-import 'package:tracking_collections/models/customer.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/models/documents.dart';
+import 'package:tracking_collections/models/transaction.dart';
 import 'package:tracking_collections/screens/amount_recieve_bottom_screen.dart';
 import 'package:tracking_collections/screens/image_viewer_screen.dart';
 import 'package:tracking_collections/utils/constants.dart';
@@ -296,7 +296,7 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
     if (_controller.index == 1 || _controller.index == 2) {
       return FloatingActionButton(
         onPressed: () {
-          viewDurationBottomSheet(context);
+          doTransactionBottomSheet(context);
           setState(() {});
         },
         child: Icon(Icons.add),
@@ -380,13 +380,13 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
     setState(() {});
   }
 
-  void viewDurationBottomSheet(BuildContext context) async {
+  void doTransactionBottomSheet(BuildContext context) async {
     Transaction trans = await showModalBottomSheet(
       context: context,
       builder: (context) {
         String title =
             (_controller.index == 1) ? 'Payment Form' : 'Penalty Form';
-        return AmountRecieveBottomScreen(title);
+        return AmountRecieveBottomScreen(title, widget.id);
       },
     );
     if (trans == null) {
