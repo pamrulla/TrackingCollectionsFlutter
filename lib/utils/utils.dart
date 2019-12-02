@@ -40,6 +40,16 @@ class Utils {
     return ret;
   }
 
+  static String getDateDisplayFormat(DateTime dt) {
+    String ret = '';
+    ret += dt.day.toString();
+    ret += ':';
+    ret += dt.month.toString();
+    ret += ':';
+    ret += dt.year.toString();
+    return ret;
+  }
+
   static String getNewFileName() {
     DateTime dt = DateTime.now();
     String ret = '';

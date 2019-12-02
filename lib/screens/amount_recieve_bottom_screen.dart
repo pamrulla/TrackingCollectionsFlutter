@@ -35,13 +35,13 @@ class _AmountRecieveBottomScreenState extends State<AmountRecieveBottomScreen> {
   @override
   void initState() {
     super.initState();
-    _textEditingControllerDate.text = Utils.getTodayDate();
     trans.customer = widget.customer;
     trans.amount = 0;
-    trans.date = "";
+    trans.date = DateTime.now();
     //TODO Agent
     trans.agent = '';
     trans.type = widget.title.contains('Penalty') ? 1 : 0;
+    _textEditingControllerDate.text = Utils.getDateDisplayFormat(trans.date);
   }
 
   @override
@@ -95,7 +95,7 @@ class _AmountRecieveBottomScreenState extends State<AmountRecieveBottomScreen> {
                                     },
                                     controller: _textEditingControllerDate,
                                     onSaved: (val) {
-                                      trans.date = val;
+                                      //trans.date = DateTime.parse(val);
                                     },
                                     textInputAction: TextInputAction.next,
                                     onFieldSubmitted: (term) {

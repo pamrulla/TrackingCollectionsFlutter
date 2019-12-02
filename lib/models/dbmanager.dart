@@ -165,7 +165,8 @@ class DBManager {
     }
   }
 
-  Future<List<CustomersList>> getCustomerList(DurationEnum type) async {
+  Future<List<CustomersList>> getCustomerList(DurationEnum type,
+      {String city = ''}) async {
     List<CustomersList> items = [];
     QuerySnapshot docs = await Firestore.instance
         .collection(lendingInfoCollection)
@@ -310,8 +311,9 @@ class DBManager {
         .orderBy('date')
         .getDocuments();
     if (docs.documents.length == 0) {
-      return null;
+      return items;
     }
+    print(docs.documents.length);
     for (int i = 0; i < docs.documents.length; ++i) {
       my_transaction.Transaction t = my_transaction.Transaction();
       t.fromDocument(docs.documents[i]);
@@ -321,6 +323,7 @@ class DBManager {
         .collection(totalAmountsCollection)
         .where('customer', isEqualTo: id)
         .getDocuments();
+    print(docs1.documents.length);
     if (docs1.documents.length == 0) {
       //Add New
       items.totalAmounts.totalPenalty = 0;

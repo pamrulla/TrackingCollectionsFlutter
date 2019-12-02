@@ -3,8 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class TotalAmounts {
   String id;
   String customer;
-  double totalRepaid;
-  double totalPenalty;
+  double totalRepaid = 0;
+  double totalPenalty = 0;
 
   Map<String, dynamic> toMap() {
     return {

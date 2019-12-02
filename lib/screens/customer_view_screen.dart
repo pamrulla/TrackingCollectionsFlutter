@@ -166,7 +166,7 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
     for (int i = 0; i < _transactionDetails.transaction.length; ++i) {
       if (checkType == _transactionDetails.transaction[i].type) {
         items.add(TableRow(
-          _transactionDetails.transaction[i].date,
+          Utils.getDateDisplayFormat(_transactionDetails.transaction[i].date),
           _transactionDetails.transaction[i].amount.toString(),
           isAmount: true,
         ));
@@ -226,6 +226,7 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           TableRow('Penalty Payment History', ''),
           MyDivider(context: context),
@@ -373,7 +374,7 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
       return;
     } else {
       String content = 'Transaction added on ' +
-          trans.date +
+          trans.date.toString() +
           ' for amount Rs. ' +
           trans.amount.toString();
       final snackBar = SnackBar(
@@ -461,7 +462,7 @@ class TableHeading extends StatelessWidget {
     return Text(
       text,
       style: TextStyle(
-        fontSize: 24.0,
+        fontSize: 20.0,
         fontWeight: FontWeight.bold,
         color: Theme.of(context).primaryColor,
       ),

@@ -6,7 +6,7 @@ class Transaction {
   String customer;
   int type;
   double amount;
-  String date;
+  DateTime date;
 
   Map<String, dynamic> toMap() {
     return {
@@ -24,6 +24,6 @@ class Transaction {
     customer = doc['customer'];
     type = doc['type'];
     amount = doc['amount'];
-    date = doc['date'];
+    date = doc['date'].toDate();
   }
 }
