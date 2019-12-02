@@ -70,4 +70,8 @@ class Utils {
     File _img = File(path);
     _img.delete();
   }
+
+  static double calculatePerMonth(double p, int t, double r) {
+    return p + ((p * t * r) / 100);
+  }
 }

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Transaction {
   String id;
   String agent;
@@ -14,5 +16,14 @@ class Transaction {
       'amount': amount,
       'date': date,
     };
+  }
+
+  void fromDocument(DocumentSnapshot doc) {
+    id = doc.documentID;
+    agent = doc['agent'];
+    customer = doc['customer'];
+    type = doc['type'];
+    amount = doc['amount'];
+    date = doc['date'];
   }
 }

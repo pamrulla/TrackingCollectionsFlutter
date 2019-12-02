@@ -9,7 +9,9 @@ import 'package:tracking_collections/models/transaction.dart';
 import 'package:tracking_collections/screens/amount_recieve_bottom_screen.dart';
 import 'package:tracking_collections/screens/image_viewer_screen.dart';
 import 'package:tracking_collections/utils/constants.dart';
+import 'package:tracking_collections/utils/utils.dart';
 import 'package:tracking_collections/viewmodels/CustomerBasicDetails.dart';
+import 'package:tracking_collections/viewmodels/TransactionDetails.dart';
 
 class CustomerViewScreen extends StatefulWidget {
   final String id;
@@ -24,6 +26,10 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
   final globalKey = GlobalKey<ScaffoldState>();
   Future<CustomerBasicDetails> _customerBasicDetailsFuture;
   Future<List<CustomerBasicDetails>> _securityBasicDetailsFuture;
+  CustomerBasicDetails _customerBasicDetails = CustomerBasicDetails();
+  Future<TransactionDetails> _transactionsFuture;
+  TransactionDetails _transactionDetails;
+  double _perMonth = 0;
 
   @override
   void initState() {
@@ -35,6 +41,7 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
         DBManager.instance.getCustomerBasicDetails(widget.id);
     _securityBasicDetailsFuture =
         DBManager.instance.getSecurityDetails(widget.id);
+    _transactionsFuture = DBManager.instance.getTransactionDetails(widget.id);
   }
 
   @override
@@ -154,6 +161,21 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
     );
   }
 
+  List<Widget> getTransactionRow(int checkType) {
+    List<Widget> items = [];
+    for (int i = 0; i < _transactionDetails.transaction.length; ++i) {
+      if (checkType == _transactionDetails.transaction[i].type) {
+        items.add(TableRow(
+          _transactionDetails.transaction[i].date,
+          _transactionDetails.transaction[i].amount.toString(),
+          isAmount: true,
+        ));
+        items.add(Divider());
+      }
+    }
+    return items;
+  }
+
   Widget getPaymentDetails() {
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(),
@@ -165,86 +187,29 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           TableRow(
             'Per Month',
-            '3000.00',
+            _perMonth.toString(),
             isAmount: true,
           ),
-          Divider(),
+          MyDivider(context: context),
           TableRow('Re-Payment History', ''),
-          Divider(),
-          Divider(),
+          MyDivider(context: context),
           TableRow('Date', 'Amount'),
           Divider(),
-          TableRow(
-            '23:05:2019',
-            '3000.00',
-            isAmount: true,
+          Column(
+            children: getTransactionRow(TransactionTypeEnum.values
+                .indexOf(TransactionTypeEnum.Repayment)),
           ),
-          Divider(),
-          TableRow(
-            '23:06:2019',
-            '3000.00',
-            isAmount: true,
-          ),
-          Divider(),
-          TableRow(
-            '23:07:2019',
-            '3000.00',
-            isAmount: true,
-          ),
-          Divider(),
-          TableRow(
-            '23:08:2019',
-            '3000.00',
-            isAmount: true,
-          ),
-          Divider(),
-          TableRow(
-            '23:09:2019',
-            '0',
-            isAmount: true,
-          ),
-          Divider(),
-          TableRow(
-            '23:10:2019',
-            '0',
-            isAmount: true,
-          ),
-          Divider(),
-          TableRow(
-            '23:11:2019',
-            '0',
-            isAmount: true,
-          ),
-          Divider(),
-          TableRow(
-            '23:12:2019',
-            '0',
-            isAmount: true,
-          ),
-          Divider(),
-          TableRow(
-            '23:01:2020',
-            '0',
-            isAmount: true,
-          ),
-          Divider(),
-          TableRow(
-            '23:02:2020',
-            '0',
-            isAmount: true,
-          ),
-          Divider(),
-          Divider(),
+          MyDivider(context: context),
           TableRow(
             'Total Amount Repaid',
-            '40000.00',
+            _transactionDetails.totalAmounts.totalRepaid.toString(),
             isAmount: true,
           ),
-          Divider(),
-          Divider(),
+          MyDivider(context: context),
         ],
       ),
     );
@@ -263,30 +228,20 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           TableRow('Penalty Payment History', ''),
-          Divider(),
-          Divider(),
+          MyDivider(context: context),
           TableRow('Date', 'Amount'),
           Divider(),
-          TableRow(
-            '23:06:2019',
-            '3000.00',
-            isAmount: true,
+          Column(
+            children: getTransactionRow(TransactionTypeEnum.values
+                .indexOf(TransactionTypeEnum.Penalty)),
           ),
-          Divider(),
-          TableRow(
-            '23:07:2019',
-            '3000.00',
-            isAmount: true,
-          ),
-          Divider(),
-          Divider(),
+          MyDivider(context: context),
           TableRow(
             'Total Penalty Paid',
-            '6000.00',
+            _transactionDetails.totalAmounts.totalPenalty.toString(),
             isAmount: true,
           ),
-          Divider(),
-          Divider(),
+          MyDivider(context: context),
         ],
       ),
     );
@@ -349,15 +304,40 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
             future: _customerBasicDetailsFuture,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                CustomerBasicDetails _customerBasicDetails = snapshot.data;
+                _customerBasicDetails = snapshot.data;
+                _perMonth = Utils.calculatePerMonth(
+                    _customerBasicDetails.lendingInfo.amount,
+                    _customerBasicDetails.lendingInfo.months,
+                    _customerBasicDetails.lendingInfo.interestRate);
+
                 return Container(child: getBasicDetails(_customerBasicDetails));
               } else {
                 return LoadingPleaseWait();
               }
             },
           ),
-          Container(child: getPaymentDetails()),
-          Container(child: getPenaltyDetails()),
+          FutureBuilder(
+            future: _transactionsFuture,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                _transactionDetails = snapshot.data;
+                return Container(child: getPaymentDetails());
+              } else {
+                return LoadingPleaseWait();
+              }
+            },
+          ),
+          FutureBuilder(
+            future: _transactionsFuture,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                _transactionDetails = snapshot.data;
+                return Container(child: getPenaltyDetails());
+              } else {
+                return LoadingPleaseWait();
+              }
+            },
+          ),
           FutureBuilder(
             future: _securityBasicDetailsFuture,
             builder: (context, snapshot) {
@@ -403,8 +383,33 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
         ),
         backgroundColor: Colors.green,
       );
+      setState(() {
+        _transactionsFuture =
+            DBManager.instance.getTransactionDetails(widget.id);
+      });
       globalKey.currentState.showSnackBar(snackBar);
     }
+  }
+}
+
+class MyDivider extends StatelessWidget {
+  const MyDivider({
+    Key key,
+    @required this.context,
+  }) : super(key: key);
+
+  final BuildContext context;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 10.0,
+      width: 20.0,
+      child: DecoratedBox(
+        decoration:
+            BoxDecoration(color: Theme.of(context).secondaryHeaderColor),
+      ),
+    );
   }
 }
 

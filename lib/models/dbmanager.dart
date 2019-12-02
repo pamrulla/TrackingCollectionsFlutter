@@ -16,6 +16,7 @@ import 'package:tracking_collections/utils/utils.dart';
 import 'package:tracking_collections/viewmodels/CustomerBasicDetails.dart';
 import 'package:tracking_collections/viewmodels/CustomerList.dart';
 import 'package:tracking_collections/models/transaction.dart' as my_transaction;
+import 'package:tracking_collections/viewmodels/TransactionDetails.dart';
 
 class DBManager {
   final String cityCollection = 'City';
@@ -27,6 +28,7 @@ class DBManager {
   final String totalAmountsCollection = 'TotalAmounts';
 
   DBManager._privateConstructor();
+
   static DBManager instance = DBManager._privateConstructor();
 
   void getCitiesList() async {
@@ -297,5 +299,35 @@ class DBManager {
           .setData(ti.toMap());
       return true;
     }
+  }
+
+  Future<TransactionDetails> getTransactionDetails(String id) async {
+    print('getting');
+    TransactionDetails items = TransactionDetails();
+    QuerySnapshot docs = await Firestore.instance
+        .collection(transactionsCollection)
+        .where('customer', isEqualTo: id)
+        .orderBy('date')
+        .getDocuments();
+    if (docs.documents.length == 0) {
+      return null;
+    }
+    for (int i = 0; i < docs.documents.length; ++i) {
+      my_transaction.Transaction t = my_transaction.Transaction();
+      t.fromDocument(docs.documents[i]);
+      items.transaction.add(t);
+    }
+    QuerySnapshot docs1 = await Firestore.instance
+        .collection(totalAmountsCollection)
+        .where('customer', isEqualTo: id)
+        .getDocuments();
+    if (docs1.documents.length == 0) {
+      //Add New
+      items.totalAmounts.totalPenalty = 0;
+      items.totalAmounts.totalRepaid = 0;
+    } else {
+      items.totalAmounts.fromDocument(docs1.documents[0]);
+    }
+    return items;
   }
 }
