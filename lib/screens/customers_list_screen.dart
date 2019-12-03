@@ -10,7 +10,7 @@ import 'package:tracking_collections/viewmodels/CustomerList.dart';
 
 class CustomersListScreen extends StatefulWidget {
   final DurationEnum currentDurationType;
-  final CityEnum currentCity;
+  final String currentCity;
   CustomersListScreen(
       {@required this.currentDurationType, @required this.currentCity});
 
@@ -41,7 +41,8 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
     String subTitle =
         durations[DurationEnum.values.indexOf(widget.currentDurationType)];
     subTitle += ":";
-    subTitle += cities[CityEnum.values.indexOf(widget.currentCity)].name;
+    subTitle +=
+        cities.singleWhere((elem) => elem.id == widget.currentCity).name;
 
     return Scaffold(
       appBar: AppBar(
@@ -55,8 +56,8 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
         ],
       ),
       body: FutureBuilder(
-          future:
-              DBManager.instance.getCustomerList(widget.currentDurationType),
+          future: DBManager.instance
+              .getCustomerList(widget.currentDurationType, widget.currentCity),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               agents = snapshot.data;

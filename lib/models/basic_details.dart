@@ -43,7 +43,6 @@ class BasicDetails {
     isSameAsPermanentAddress = map['isSameAsPermanentAddress'];
     permanentAddress = map['permanentAddress'];
     temporaryAddress = map['temporaryAddress'];
-    print(map['phone']);
   }
 
   void fromDocument(DocumentSnapshot map) {

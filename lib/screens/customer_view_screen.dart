@@ -33,7 +33,6 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
 
   @override
   void initState() {
-    print(widget.id);
     super.initState();
     _controller = TabController(vsync: this, length: 4);
     _controller.addListener(_handleTabSelection);

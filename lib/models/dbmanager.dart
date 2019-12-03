@@ -41,15 +41,12 @@ class DBManager {
         city.fromDocument(doc);
         cities.add(city);
       });
-      print(cities);
     });
   }
 
   Future<bool> addAgent(Agent agent) async {
-    print('Just Inside');
     DocumentReference doc =
         await Firestore.instance.collection(agentCollection).add(agent.toMap());
-    print('Just Inside After');
     if (doc == null) {
       return false;
     } else {
@@ -165,12 +162,13 @@ class DBManager {
     }
   }
 
-  Future<List<CustomersList>> getCustomerList(DurationEnum type,
-      {String city = ''}) async {
+  Future<List<CustomersList>> getCustomerList(
+      DurationEnum type, String city) async {
     List<CustomersList> items = [];
     QuerySnapshot docs = await Firestore.instance
         .collection(lendingInfoCollection)
         .where('durationType', isEqualTo: DurationEnum.values.indexOf(type))
+        .where('city', isEqualTo: city)
         .getDocuments();
     for (int i = 0; i < docs.documents.length; ++i) {
       prefix0.DocumentSnapshot doc = docs.documents[i];
@@ -303,7 +301,6 @@ class DBManager {
   }
 
   Future<TransactionDetails> getTransactionDetails(String id) async {
-    print('getting');
     TransactionDetails items = TransactionDetails();
     QuerySnapshot docs = await Firestore.instance
         .collection(transactionsCollection)
@@ -313,7 +310,6 @@ class DBManager {
     if (docs.documents.length == 0) {
       return items;
     }
-    print(docs.documents.length);
     for (int i = 0; i < docs.documents.length; ++i) {
       my_transaction.Transaction t = my_transaction.Transaction();
       t.fromDocument(docs.documents[i]);
@@ -323,13 +319,29 @@ class DBManager {
         .collection(totalAmountsCollection)
         .where('customer', isEqualTo: id)
         .getDocuments();
-    print(docs1.documents.length);
     if (docs1.documents.length == 0) {
       //Add New
       items.totalAmounts.totalPenalty = 0;
       items.totalAmounts.totalRepaid = 0;
     } else {
       items.totalAmounts.fromDocument(docs1.documents[0]);
+    }
+    return items;
+  }
+
+  Future<List<Agent>> getAgentsList(DurationEnum type) async {
+    List<Agent> items = [];
+    QuerySnapshot docs = await Firestore.instance
+        .collection(agentCollection)
+        .where('durationType', isEqualTo: DurationEnum.values.indexOf(type))
+        .getDocuments();
+    if (docs.documents.length == 0) {
+      return items;
+    }
+    for (int i = 0; i < docs.documents.length; ++i) {
+      Agent a = Agent();
+      a.fromDocument(docs.documents[i]);
+      items.add(a);
     }
     return items;
   }

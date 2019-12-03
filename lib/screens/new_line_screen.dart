@@ -53,7 +53,6 @@ class _NewLineScreenState extends State<NewLineScreen> {
             setState(() {
               _duration = value;
               agent.durationType = DurationEnum.values.indexOf(value);
-              print(agent.durationType);
             });
           },
         ),
@@ -265,9 +264,7 @@ class _NewLineScreenState extends State<NewLineScreen> {
       if (_formKey.currentState.validate()) {
         displayLoading(true);
         _formKey.currentState.save();
-        print('Just Before');
         bool isSuccess = await DBManager.instance.addAgent(agent);
-        print('Just After');
         displayLoading(false);
         if (isSuccess) {
           await onSuccess();
