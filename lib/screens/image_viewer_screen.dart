@@ -24,7 +24,10 @@ class ImageViewer extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Expanded(
-              child: Image.network(img),
+              child: Hero(
+                child: Image.network(img),
+                tag: img,
+              ),
             )
           ],
         ),

@@ -62,10 +62,24 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Center(
-            child: Image.network(
-              cbd.basicDetails.photo,
-              width: 100,
-              height: 100,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) {
+                  return ImageViewer(
+                    cbd.basicDetails.photo,
+                    title: "Photo",
+                  );
+                }));
+              },
+              child: Hero(
+                tag: cbd.basicDetails.photo,
+                child: Image.network(
+                  cbd.basicDetails.photo,
+                  width: 100,
+                  height: 100,
+                ),
+              ),
             ),
           ),
           Divider(),
