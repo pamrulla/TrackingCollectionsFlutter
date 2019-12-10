@@ -16,3 +16,4 @@ const List<IconData> agentListActionsIcons = [
   Icons.view_list,
   Icons.add_circle
 ];
+const String userNameTail = "@trackingcollectionsapp.com";

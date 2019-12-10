@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:tracking_collections/components/error_snackbar.dart';
 import 'package:tracking_collections/components/success_snackbar.dart';
 import 'package:tracking_collections/screens/login_screen.dart';
+import 'package:tracking_collections/utils/auth.dart';
+import 'package:tracking_collections/utils/globals.dart';
 
 class Utils {
   static void fieldFocusChange(
@@ -16,7 +18,8 @@ class Utils {
     FocusScope.of(context).requestFocus(new FocusNode());
   }
 
-  static void logOut(BuildContext context) {
+  static void logOut(BuildContext context) async {
+    await Authorization().logOut();
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => LoginScreen()),
         (Route<dynamic> route) => false);
@@ -83,5 +86,9 @@ class Utils {
 
   static double calculatePerMonth(double p, int t, double r) {
     return p + ((p * t * r) / 100);
+  }
+
+  static void checkIsHead() {
+    isHead = currentAgent.role == 'head';
   }
 }

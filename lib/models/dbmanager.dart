@@ -11,11 +11,11 @@ import 'package:tracking_collections/models/city.dart';
 import 'package:tracking_collections/models/documents.dart';
 import 'package:tracking_collections/models/lending_info.dart';
 import 'package:tracking_collections/models/total_amounts.dart';
+import 'package:tracking_collections/models/transaction.dart' as my_transaction;
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/utils.dart';
 import 'package:tracking_collections/viewmodels/CustomerBasicDetails.dart';
 import 'package:tracking_collections/viewmodels/CustomerList.dart';
-import 'package:tracking_collections/models/transaction.dart' as my_transaction;
 import 'package:tracking_collections/viewmodels/TransactionDetails.dart';
 
 class DBManager {
@@ -53,6 +53,19 @@ class DBManager {
       agent.id = doc.documentID;
       return true;
     }
+  }
+
+  Future<Agent> getAgentInfo(String userId) async {
+    Agent agent = Agent();
+    QuerySnapshot docs = await Firestore.instance
+        .collection(agentCollection)
+        .where('userId', isEqualTo: userId)
+        .getDocuments();
+    if (docs.documents.length != 1) {
+      return null;
+    }
+    agent.fromDocument(docs.documents[0]);
+    return agent;
   }
 
   Future<String> uploadFileAndGetUrl(String path) async {
