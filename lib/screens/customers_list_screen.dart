@@ -36,6 +36,15 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
     }
   }
 
+  List<Widget> getAppBarActionsList() {
+    List<Widget> items = [];
+    if (Navigator.canPop(context)) {
+      items.add(GotoHome());
+    }
+    items.add(Logout());
+    return items;
+  }
+
   @override
   Widget build(BuildContext context) {
     String subTitle =
@@ -50,10 +59,15 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
           title: 'Customers List',
           subTitle: subTitle,
         ),
-        actions: <Widget>[
-          GotoHome(),
-          Logout(),
-        ],
+        actions: getAppBarActionsList(),
+      ),
+      floatingActionButton: Tooltip(
+        message: "Add New Customer",
+        child: FloatingActionButton(
+          onPressed: () {},
+          child: Icon(Icons.add),
+          backgroundColor: Theme.of(context).accentColor,
+        ),
       ),
       body: FutureBuilder(
           future: DBManager.instance
@@ -61,95 +75,79 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               agents = snapshot.data;
-              return Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  verticalDirection: VerticalDirection.down,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Expanded(
-                      flex: 1,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
+              if (agents.length == 0) {
+                return Center(child: Text('No Customers'));
+              } else {
+                return Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    verticalDirection: VerticalDirection.down,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Expanded(
+                        flex: 1,
                         child: SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          child: DataTable(
-                              sortAscending: sort,
-                              sortColumnIndex: 0,
-                              columns: [
-                                /*DataColumn(
-                            label: Text('Id'),
-                            numeric: false,
-                          ),*/
-                                DataColumn(
-                                  label: Text('Name'),
-                                  numeric: false,
-                                  onSort: (columnIndex, ascending) {
-                                    setState(() {
-                                      sort = !sort;
-                                    });
-                                    onSortColumn(columnIndex, ascending);
-                                  },
-                                ),
-                                DataColumn(
-                                  label: Text('Amount'),
-                                  numeric: true,
-                                ),
-                                DataColumn(
-                                  label: Text('Interest Rate'),
-                                  numeric: true,
-                                ),
-                                /*DataColumn(
-                            label: Text('Penalty Amount'),
-                            numeric: true,
-                          ),*/
-                              ],
-                              rows: agents
-                                  .map(
-                                    (agent) => DataRow(
-                                      cells: [
-                                        /*DataCell(
-                                    Text(agent.id.toString()),
-                                    onTap: () {
-                                      viewDurationBottomSheet(agent.id);
+                          scrollDirection: Axis.horizontal,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.vertical,
+                            child: DataTable(
+                                sortAscending: sort,
+                                sortColumnIndex: 0,
+                                columns: [
+                                  DataColumn(
+                                    label: Text('Name'),
+                                    numeric: false,
+                                    onSort: (columnIndex, ascending) {
+                                      setState(() {
+                                        sort = !sort;
+                                      });
+                                      onSortColumn(columnIndex, ascending);
                                     },
-                                  ),*/
-                                        DataCell(
-                                          Text(agent.name),
-                                          onTap: () {
-                                            viewCustomer(agent.id);
-                                          },
-                                        ),
-                                        DataCell(
-                                          Text(agent.amount.toString()),
-                                          onTap: () {
-                                            viewCustomer(agent.id);
-                                          },
-                                        ),
-                                        DataCell(
-                                          Text(agent.interestRate.toString()),
-                                          onTap: () {
-                                            viewCustomer(agent.id);
-                                          },
-                                        ),
-                                        /*DataCell(
-                                    Text(agent.penaltyAmount.toString()),
-                                    onTap: () {
-                                      viewDurationBottomSheet(agent.id);
-                                    },
-                                  ),*/
-                                      ],
-                                    ),
-                                  )
-                                  .toList()),
+                                  ),
+                                  DataColumn(
+                                    label: Text('Amount'),
+                                    numeric: true,
+                                  ),
+                                  DataColumn(
+                                    label: Text('Interest Rate'),
+                                    numeric: true,
+                                  ),
+                                ],
+                                rows: agents
+                                    .map(
+                                      (agent) => DataRow(
+                                        cells: [
+                                          DataCell(
+                                            Text(agent.name),
+                                            onTap: () {
+                                              viewCustomer(agent.id);
+                                            },
+                                          ),
+                                          DataCell(
+                                            Text(agent.amount.toString()),
+                                            onTap: () {
+                                              viewCustomer(agent.id);
+                                            },
+                                          ),
+                                          DataCell(
+                                            Text(agent.interestRate.toString()),
+                                            onTap: () {
+                                              viewCustomer(agent.id);
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                    .toList()),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              );
+                    ],
+                  ),
+                );
+              }
             } else {
               return LoadingPleaseWait();
             }

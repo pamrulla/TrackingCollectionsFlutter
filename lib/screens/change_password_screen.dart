@@ -1,40 +1,39 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
 import 'package:tracking_collections/components/custom_text_from_field.dart';
 import 'package:tracking_collections/components/loading_please_wait.dart';
+import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/components/myRaisedButton.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
-import 'package:tracking_collections/screens/change_password_screen.dart';
-import 'package:tracking_collections/screens/customers_list_screen.dart';
-import 'package:tracking_collections/screens/main_screen.dart';
 import 'package:tracking_collections/utils/auth.dart';
-import 'package:tracking_collections/utils/constants.dart';
-import 'package:tracking_collections/utils/globals.dart';
 import 'package:tracking_collections/utils/utils.dart';
 
-class LoginScreen extends StatefulWidget {
+class ChangePasswordScreen extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _ChangePasswordScreenState createState() => _ChangePasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  FocusNode _focusNodeUserName = FocusNode();
+  FocusNode _focusNodeConfirmPassword = FocusNode();
   FocusNode _focusNodePassword = FocusNode();
-  static final TextEditingController _textEditingControllerUserName =
+  static final TextEditingController _textEditingControllerConfirmPassword =
       TextEditingController();
   static final TextEditingController _textEditingControllerPassword =
       TextEditingController();
 
-  String _userName = '';
+  String _userConfirmPassword = '';
   String _password = '';
-  bool _isLoggingIn = false;
+  bool _isProcessing = false;
 
   @override
   void initState() {
     super.initState();
     _textEditingControllerPassword.clear();
-    _textEditingControllerUserName.clear();
+    _textEditingControllerConfirmPassword.clear();
     DBManager.instance.getCitiesList();
   }
 
@@ -43,7 +42,13 @@ class _LoginScreenState extends State<LoginScreen> {
     return SafeArea(
       child: Scaffold(
         key: _globalKey,
-        body: _isLoggingIn
+        appBar: AppBar(
+          title: AppbarTitileWithSubtitle(title: 'Change Password'),
+          actions: <Widget>[
+            Logout(),
+          ],
+        ),
+        body: _isProcessing
             ? LoadingPleaseWait()
             : Column(
                 children: <Widget>[
@@ -68,33 +73,35 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
                                   CustomTextFromField(
-                                    focusNode: _focusNodeUserName,
+                                    focusNode: _focusNodeConfirmPassword,
                                     icon: Icons.verified_user,
-                                    hintText: 'Username',
+                                    hintText: 'Password',
                                     validator: (value) {
                                       if (value.isEmpty) {
-                                        return 'Username should not be empty';
+                                        return 'Password should not be empty';
                                       }
                                       return null;
                                     },
-                                    controller: _textEditingControllerUserName,
+                                    controller:
+                                        _textEditingControllerConfirmPassword,
                                     onSaved: (val) {
                                       setState(() {
-                                        _userName = val;
+                                        _userConfirmPassword = val;
                                       });
                                     },
                                     textInputAction: TextInputAction.next,
                                     onFieldSubmitted: (term) {
                                       Utils.fieldFocusChange(
                                           context,
-                                          _focusNodeUserName,
+                                          _focusNodeConfirmPassword,
                                           _focusNodePassword);
                                     },
+                                    obscureText: true,
                                   ),
                                   CustomTextFromField(
                                     focusNode: _focusNodePassword,
                                     icon: Icons.verified_user,
-                                    hintText: 'Password',
+                                    hintText: 'Confirm Password',
                                     validator: (value) {
                                       if (value.isEmpty) {
                                         return 'Password should not be empty';
@@ -114,12 +121,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                     },
                                     obscureText: true,
                                   ),
+                                  Center(
+                                    child: Text(
+                                      '- Minimum length should be 6 characters',
+                                      style: TextStyle(
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                    ),
+                                  ),
                                   SizedBox(
                                     height: 20.0,
                                   ),
                                   MyRaisedButton(
-                                    name: 'Login',
-                                    onPressed: onLogin,
+                                    name: 'Change Password',
+                                    onPressed: onSubmit,
                                   )
                                 ],
                               ),
@@ -135,45 +150,32 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void setLoggingIn(bool value) {
+  void setLoading(bool value) {
     setState(() {
-      _isLoggingIn = value;
+      _isProcessing = value;
     });
   }
 
-  void onLogin() async {
+  void onSubmit() async {
     final _form = _formKey.currentState;
     if (_form.validate()) {
       _form.save();
-      setLoggingIn(true);
-      bool ret = await Authorization().logIn(_userName, _password);
-      setLoggingIn(false);
+      if (_userConfirmPassword != _password) {
+        Utils.showErrorSnackBar(_globalKey,
+            text: "Both passwords should match");
+        return;
+      }
+      setLoading(true);
+      bool ret = await Authorization().changePassword(_password);
+      setLoading(false);
       if (ret) {
-        if (currentAgent.isFirstTime) {
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) {
-            return ChangePasswordScreen();
-          }));
-        } else {
-          if (isHead) {
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) {
-              return MainScreen();
-            }));
-          } else {
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) {
-              return CustomersListScreen(
-                currentCity: currentAgent.city,
-                currentDurationType:
-                    DurationEnum.values[currentAgent.durationType],
-              );
-            }));
-          }
-        }
+        Utils.showSuccessSnackBar(_globalKey,
+            text: "Success fully changed password, please login again...");
+        sleep(Duration(seconds: 1));
+        Utils.logOut(context);
       } else {
         Utils.showErrorSnackBar(_globalKey,
-            text: "Authentication failed, please try again...");
+            text: "Password change failed, please try again...");
       }
     }
   }

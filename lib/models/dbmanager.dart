@@ -32,6 +32,9 @@ class DBManager {
   static DBManager instance = DBManager._privateConstructor();
 
   void getCitiesList() async {
+    if (cities.length != 0) {
+      return;
+    }
     await Firestore.instance
         .collection(cityCollection)
         .snapshots()
@@ -66,6 +69,17 @@ class DBManager {
     }
     agent.fromDocument(docs.documents[0]);
     return agent;
+  }
+
+  Future<bool> updateAgent(Agent agent) async {
+    await Firestore.instance
+        .collection(agentCollection)
+        .document(agent.id)
+        .setData(agent.toMap())
+        .catchError((e) {
+      return false;
+    });
+    return true;
   }
 
   Future<String> uploadFileAndGetUrl(String path) async {

@@ -30,7 +30,7 @@ class _MainScreenState extends State<MainScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Expanded(
-                flex: 4,
+                flex: 3,
                 child: Hero(
                   tag: 'logo',
                   child: Image.asset(
@@ -69,12 +69,7 @@ class _MainScreenState extends State<MainScreen> {
                   onPressed: viewDurationBottomSheet,
                 ),
               ),
-              SizedBox(
-                width: 10.0,
-              ),
-              Spacer(
-                flex: 2,
-              ),
+              Spacer(),
             ],
           ),
         ),
