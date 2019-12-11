@@ -6,20 +6,18 @@ import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/screens/customer_view_screen.dart';
 import 'package:tracking_collections/utils/constants.dart';
+import 'package:tracking_collections/utils/globals.dart';
 import 'package:tracking_collections/viewmodels/CustomerList.dart';
 
 class CustomersListScreen extends StatefulWidget {
-  final DurationEnum currentDurationType;
-  final String currentCity;
-  CustomersListScreen(
-      {@required this.currentDurationType, @required this.currentCity});
+  CustomersListScreen();
 
   @override
   _CustomersListScreenState createState() => _CustomersListScreenState();
 }
 
 class _CustomersListScreenState extends State<CustomersListScreen> {
-  List<CustomersList> agents = [];
+  List<CustomersList> customers = [];
   bool sort = false;
   @override
   void initState() {
@@ -29,9 +27,9 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
   void onSortColumn(int columnIndex, bool ascending) {
     if (columnIndex == 0) {
       if (ascending) {
-        agents.sort((a, b) => a.name.compareTo(b.name));
+        customers.sort((a, b) => a.name.compareTo(b.name));
       } else {
-        agents.sort((a, b) => b.name.compareTo(a.name));
+        customers.sort((a, b) => b.name.compareTo(a.name));
       }
     }
   }
@@ -47,11 +45,7 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String subTitle =
-        durations[DurationEnum.values.indexOf(widget.currentDurationType)];
-    subTitle += ":";
-    subTitle +=
-        cities.singleWhere((elem) => elem.id == widget.currentCity).name;
+    String subTitle = currentAgent.name;
 
     return Scaffold(
       appBar: AppBar(
@@ -70,12 +64,11 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
         ),
       ),
       body: FutureBuilder(
-          future: DBManager.instance
-              .getCustomerList(widget.currentDurationType, widget.currentCity),
+          future: DBManager.instance.getCustomerList(currentAgent.id),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              agents = snapshot.data;
-              if (agents.length == 0) {
+              customers = snapshot.data;
+              if (customers.length == 0) {
                 return Center(child: Text('No Customers'));
               } else {
                 return Padding(
@@ -114,27 +107,36 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
                                     label: Text('Interest Rate'),
                                     numeric: true,
                                   ),
+                                  DataColumn(
+                                    label: Text('Duration Type'),
+                                  ),
                                 ],
-                                rows: agents
+                                rows: customers
                                     .map(
-                                      (agent) => DataRow(
+                                      (cust) => DataRow(
                                         cells: [
                                           DataCell(
-                                            Text(agent.name),
+                                            Text(cust.name),
                                             onTap: () {
-                                              viewCustomer(agent.id);
+                                              viewCustomer(cust.id);
                                             },
                                           ),
                                           DataCell(
-                                            Text(agent.amount.toString()),
+                                            Text(cust.amount.toString()),
                                             onTap: () {
-                                              viewCustomer(agent.id);
+                                              viewCustomer(cust.id);
                                             },
                                           ),
                                           DataCell(
-                                            Text(agent.interestRate.toString()),
+                                            Text(cust.interestRate.toString()),
                                             onTap: () {
-                                              viewCustomer(agent.id);
+                                              viewCustomer(cust.id);
+                                            },
+                                          ),
+                                          DataCell(
+                                            Text(durations[cust.durationType]),
+                                            onTap: () {
+                                              viewCustomer(cust.id);
                                             },
                                           ),
                                         ],

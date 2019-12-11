@@ -161,10 +161,7 @@ class _AgentListScreenState extends State<AgentListScreen> {
         context,
         MaterialPageRoute(
           builder: (context) {
-            return CustomersListScreen(
-              currentDurationType: widget.currentDurationType,
-              currentCity: agent.city,
-            );
+            return CustomersListScreen();
           },
         ),
       );

@@ -35,10 +35,7 @@ class DBManager {
     if (cities.length != 0) {
       return;
     }
-    await Firestore.instance
-        .collection(cityCollection)
-        .snapshots()
-        .listen((data) {
+    Firestore.instance.collection(cityCollection).snapshots().listen((data) {
       data.documents.forEach((doc) {
         City city = City();
         city.fromDocument(doc);
@@ -189,13 +186,11 @@ class DBManager {
     }
   }
 
-  Future<List<CustomersList>> getCustomerList(
-      DurationEnum type, String city) async {
+  Future<List<CustomersList>> getCustomerList(String agent) async {
     List<CustomersList> items = [];
     QuerySnapshot docs = await Firestore.instance
         .collection(lendingInfoCollection)
-        .where('durationType', isEqualTo: DurationEnum.values.indexOf(type))
-        .where('city', isEqualTo: city)
+        .where('agent', isEqualTo: agent)
         .getDocuments();
     for (int i = 0; i < docs.documents.length; ++i) {
       prefix0.DocumentSnapshot doc = docs.documents[i];
@@ -205,8 +200,8 @@ class DBManager {
           .get();
       items.add(CustomersList(
         id: ds.documentID,
-        penaltyAmount: 0.0,
         interestRate: doc['interestRate'],
+        durationType: doc['durationType'],
         amount: doc['amount'],
         name: ds['name'],
       ));

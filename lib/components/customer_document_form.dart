@@ -10,7 +10,7 @@ class CustomerDocumentForm extends StatefulWidget {
   final Function onContinue;
   final Function onBack;
   final Documents data;
-  GlobalKey<FormState> formKey;
+  final GlobalKey<FormState> formKey;
   CustomerDocumentForm(
       {@required this.formKey,
       @required this.onContinue,

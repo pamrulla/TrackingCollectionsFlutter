@@ -8,7 +8,7 @@ class CustomerLendingInfoForm extends StatefulWidget {
   final Function onContinue;
   final Function onBack;
   final LendingInfo data;
-  GlobalKey<FormState> formKey;
+  final GlobalKey<FormState> formKey;
   CustomerLendingInfoForm({
     @required this.formKey,
     @required this.onContinue,

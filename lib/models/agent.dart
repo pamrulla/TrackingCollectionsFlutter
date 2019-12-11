@@ -5,7 +5,6 @@ class Agent {
   String name;
   String number;
   String city;
-  int durationType;
   String userId;
   String role;
   bool isFirstTime = true;
@@ -15,7 +14,6 @@ class Agent {
       'name': name,
       'number': number,
       'city': city,
-      'durationType': durationType,
       'userId': userId,
       'role': role,
       'isFirstTime': isFirstTime,
@@ -27,7 +25,6 @@ class Agent {
     name = map['name'];
     number = map['number'];
     city = map['city'];
-    durationType = map['durationType'];
     userId = map['userId'];
     role = map['role'];
     isFirstTime = map['isFirstTime'];
@@ -38,7 +35,6 @@ class Agent {
     name = doc['name'];
     number = doc['number'];
     city = doc['city'];
-    durationType = doc['durationType'];
     userId = doc['userId'];
     role = doc['role'];
     isFirstTime = doc['isFirstTime'];

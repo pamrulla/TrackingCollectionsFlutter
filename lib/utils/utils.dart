@@ -29,7 +29,7 @@ class Utils {
     if (s == null) {
       return false;
     }
-    return double.parse(s, (e) => null) != null;
+    return double.tryParse(s) != null;
   }
 
   static String getTodayDate() {

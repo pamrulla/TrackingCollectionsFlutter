@@ -12,7 +12,7 @@ class CustomerBasicDetailsForm extends StatefulWidget {
   final Function onContinue;
   final Function onBack;
   final BasicDetails data;
-  GlobalKey<FormState> formKey;
+  final GlobalKey<FormState> formKey;
   CustomerBasicDetailsForm(
       {@required this.formKey,
       @required this.onContinue,
@@ -47,7 +47,7 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
   List<FocusNode> _focusNodePhone = [];
   List<TextEditingController> _textEditingControllerPhone = [];
 
-  File _image = null;
+  File _image;
 
   @override
   void initState() {

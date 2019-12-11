@@ -7,7 +7,6 @@ import 'package:tracking_collections/screens/change_password_screen.dart';
 import 'package:tracking_collections/screens/customers_list_screen.dart';
 import 'package:tracking_collections/screens/main_screen.dart';
 import 'package:tracking_collections/utils/auth.dart';
-import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/globals.dart';
 import 'package:tracking_collections/utils/utils.dart';
 
@@ -163,11 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
           } else {
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) {
-              return CustomersListScreen(
-                currentCity: currentAgent.city,
-                currentDurationType:
-                    DurationEnum.values[currentAgent.durationType],
-              );
+              return CustomersListScreen();
             }));
           }
         }

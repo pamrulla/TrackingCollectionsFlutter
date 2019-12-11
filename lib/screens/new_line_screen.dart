@@ -37,7 +37,6 @@ class _NewLineScreenState extends State<NewLineScreen> {
     super.initState();
     _textEditingControllerAgentName.clear();
     _textEditingControllerAgentNumber.clear();
-    agent.durationType = 0;
     agent.city = cities[0].id;
   }
 
@@ -52,7 +51,6 @@ class _NewLineScreenState extends State<NewLineScreen> {
           onChanged: (DurationEnum value) {
             setState(() {
               _duration = value;
-              agent.durationType = DurationEnum.values.indexOf(value);
             });
           },
         ),

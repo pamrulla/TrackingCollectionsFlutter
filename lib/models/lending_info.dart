@@ -9,6 +9,7 @@ class LendingInfo {
   double amount;
   int months;
   double interestRate;
+  String agent;
 
   Map<String, dynamic> toMap() {
     return {
@@ -19,6 +20,7 @@ class LendingInfo {
       'amount': amount,
       'months': months,
       'interestRate': interestRate,
+      'agent': agent,
     };
   }
 
@@ -31,5 +33,6 @@ class LendingInfo {
     amount = map['amount'];
     months = map['months'];
     interestRate = map['interestRate'];
+    agent = map['agent'];
   }
 }

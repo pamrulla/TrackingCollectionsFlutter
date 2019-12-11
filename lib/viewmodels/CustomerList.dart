@@ -3,7 +3,7 @@ class CustomersList {
   String name;
   double amount;
   double interestRate;
-  double penaltyAmount;
+  int durationType;
   CustomersList(
-      {this.id, this.name, this.amount, this.interestRate, this.penaltyAmount});
+      {this.id, this.name, this.amount, this.interestRate, this.durationType});
 }
