@@ -367,4 +367,47 @@ class DBManager {
     }
     return items;
   }
+
+  Future<bool> performAddCustomer(
+      BasicDetails basicDetails,
+      LendingInfo lendingInfo,
+      Documents documents,
+      List<BasicDetails> securities,
+      List<Documents> securitiesDocs) async {
+    bool ret = true;
+
+    WriteBatch batch = Firestore.instance.batch();
+
+    DocumentReference bd =
+        Firestore.instance.collection(basicDetailsCollection).document();
+    batch.setData(bd, basicDetails.toMap());
+
+    lendingInfo.customer = bd.documentID;
+    DocumentReference li =
+        Firestore.instance.collection(lendingInfoCollection).document();
+    batch.setData(li, lendingInfo.toMap());
+
+    documents.customer = bd.documentID;
+    DocumentReference dd =
+        Firestore.instance.collection(documentsCollection).document();
+    batch.setData(dd, documents.toMap());
+
+    for (int i = 0; i < securities.length; ++i) {
+      securities[i].customer = bd.documentID;
+      DocumentReference sd =
+          Firestore.instance.collection(basicDetailsCollection).document();
+      batch.setData(sd, securities[i].toMap());
+
+      securitiesDocs[i].customer = sd.documentID;
+      DocumentReference sdd =
+          Firestore.instance.collection(documentsCollection).document();
+      batch.setData(sdd, securitiesDocs[i].toMap());
+    }
+
+    await batch.commit().catchError((e) {
+      ret = false;
+    });
+
+    return ret;
+  }
 }

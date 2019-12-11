@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class City {
-  String id;
-  String name;
+  String id = '';
+  String name = '';
 
   Map<String, dynamic> toMap() {
     return {'name': name};

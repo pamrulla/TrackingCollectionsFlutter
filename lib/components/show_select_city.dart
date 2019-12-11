@@ -4,7 +4,8 @@ import 'package:tracking_collections/components/form_sub_heading_text.dart';
 
 class ShowSelectCity extends StatefulWidget {
   final Function onSelected;
-  ShowSelectCity({@required this.onSelected});
+  final String city;
+  ShowSelectCity({@required this.onSelected, this.city = ''});
 
   @override
   _ShowSelectCityState createState() => _ShowSelectCityState();
@@ -22,6 +23,7 @@ class _ShowSelectCityState extends State<ShowSelectCity> {
         ),
         Expanded(
           child: CitiesPopUpMenuButton(
+            city: widget.city,
             onSelected: (value) {
               widget.onSelected(value);
             },

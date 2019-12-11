@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Documents {
-  String id;
-  String customer;
+  String id = '';
+  String customer = '';
   List<String> documentNames = [];
   List<String> documentProofs = [];
 

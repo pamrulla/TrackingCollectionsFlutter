@@ -27,22 +27,63 @@ class _CustomerDocumentFormState extends State<CustomerDocumentForm> {
   List<TextEditingController> _textEditingControllerDocumentName = [];
   List<FocusNode> _focusNodeDocumentPath = [];
   List<TextEditingController> _textEditingControllerDocumentPath = [];
+  List<bool> isImageChanged = [];
 
   @override
   void initState() {
     super.initState();
     _formKey = widget.formKey;
-    _focusNodeDocumentName.add(FocusNode());
-    _textEditingControllerDocumentName.add(TextEditingController());
-    _focusNodeDocumentPath.add(FocusNode());
-    _textEditingControllerDocumentPath.add(TextEditingController());
+    _focusNodeDocumentName.clear();
+    _textEditingControllerDocumentName.clear();
+    _focusNodeDocumentPath.clear();
+    _textEditingControllerDocumentPath.clear();
+    isImageChanged.clear();
+
+    if (widget.data.documentProofs.length == 0) {
+      _focusNodeDocumentName.add(FocusNode());
+      _textEditingControllerDocumentName.add(TextEditingController());
+      _focusNodeDocumentPath.add(FocusNode());
+      _textEditingControllerDocumentPath.add(TextEditingController());
+      isImageChanged.add(false);
+    } else {
+      for (int i = 0; i < widget.data.documentProofs.length; ++i) {
+        _focusNodeDocumentName.add(FocusNode());
+        _textEditingControllerDocumentName.add(TextEditingController());
+        _textEditingControllerDocumentName[i].text =
+            widget.data.documentNames[i];
+        _focusNodeDocumentPath.add(FocusNode());
+        _textEditingControllerDocumentPath.add(TextEditingController());
+        _textEditingControllerDocumentPath[i].text =
+            widget.data.documentProofs[i];
+        isImageChanged.add(false);
+      }
+    }
   }
 
   Widget getImage(int index) {
+    if (isImageChanged[index]) {
+      return Image.asset(
+        _textEditingControllerDocumentPath[index].text,
+        width: 200,
+        height: 200,
+      );
+    } else if (widget.data.id.isNotEmpty &&
+        _textEditingControllerDocumentPath[index].text.isNotEmpty) {
+      return Image.network(
+        _textEditingControllerDocumentPath[index].text,
+        width: 200,
+        height: 200,
+      );
+    } else if (widget.data.id.isEmpty &&
+        _textEditingControllerDocumentPath[index].text.isNotEmpty) {
+      return Image.asset(
+        _textEditingControllerDocumentPath[index].text,
+        width: 200,
+        height: 200,
+      );
+    }
     return Image.asset(
-      _textEditingControllerDocumentPath[index].text.isEmpty
-          ? 'images/profile.jpg'
-          : _textEditingControllerDocumentPath[index].text,
+      'images/profile.jpg',
       width: 200,
       height: 200,
     );
@@ -52,6 +93,7 @@ class _CustomerDocumentFormState extends State<CustomerDocumentForm> {
     var image = await ImagePicker.pickImage(source: ImageSource.camera);
     setState(() {
       _textEditingControllerDocumentPath[index].text = image.path;
+      isImageChanged[index] = true;
     });
   }
 
@@ -60,6 +102,7 @@ class _CustomerDocumentFormState extends State<CustomerDocumentForm> {
     _focusNodeDocumentPath.add(FocusNode());
     _textEditingControllerDocumentName.add(TextEditingController());
     _textEditingControllerDocumentPath.add(TextEditingController());
+    isImageChanged.add(false);
     setState(() {});
   }
 
@@ -81,8 +124,7 @@ class _CustomerDocumentFormState extends State<CustomerDocumentForm> {
     _focusNodeDocumentPath.removeAt(index);
     _textEditingControllerDocumentName.removeAt(index);
     _textEditingControllerDocumentPath.removeAt(index);
-    //widget.data.documentProofs.removeAt(index);
-    //widget.data.documentNames.removeAt(index);
+    isImageChanged.removeAt(index);
     setState(() {});
   }
 
@@ -105,7 +147,11 @@ class _CustomerDocumentFormState extends State<CustomerDocumentForm> {
               },
               controller: _textEditingControllerDocumentName[i],
               onSaved: (val) {
-                widget.data.documentNames.add(val);
+                if (i >= widget.data.documentNames.length) {
+                  widget.data.documentNames.add(val);
+                } else {
+                  widget.data.documentNames[i] = val;
+                }
               },
               textInputAction: TextInputAction.done,
               onFieldSubmitted: (term) {
@@ -133,7 +179,11 @@ class _CustomerDocumentFormState extends State<CustomerDocumentForm> {
           },
           controller: _textEditingControllerDocumentPath[i],
           onSaved: (val) {
-            widget.data.documentProofs.add(val);
+            if (i >= widget.data.documentProofs.length) {
+              widget.data.documentProofs.add(val);
+            } else {
+              widget.data.documentProofs[i] = val;
+            }
           },
           enabled: false,
         ),

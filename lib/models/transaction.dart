@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Transaction {
-  String id;
-  String agent;
-  String customer;
-  int type;
-  double amount;
-  DateTime date;
+  String id = '';
+  String agent = '';
+  String customer = '';
+  int type = 0;
+  double amount = 0;
+  DateTime date = DateTime.now();
 
   Map<String, dynamic> toMap() {
     return {

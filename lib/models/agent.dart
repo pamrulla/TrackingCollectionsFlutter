@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Agent {
-  String id;
-  String name;
-  String number;
-  String city;
-  String userId;
-  String role;
+  String id = '';
+  String name = '';
+  String number = '';
+  String city = '';
+  String userId = '';
+  String role = '';
   bool isFirstTime = true;
 
   Map<String, dynamic> toMap() {

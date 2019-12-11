@@ -4,7 +4,8 @@ import 'package:tracking_collections/utils/constants.dart';
 
 class CitiesPopUpMenuButton extends StatefulWidget {
   final Function onSelected;
-  CitiesPopUpMenuButton({this.onSelected});
+  final String city;
+  CitiesPopUpMenuButton({this.onSelected, this.city});
 
   @override
   _CitiesPopUpMenuButtonState createState() => _CitiesPopUpMenuButtonState();
@@ -22,6 +23,14 @@ class _CitiesPopUpMenuButtonState extends State<CitiesPopUpMenuButton> {
       items.add(item);
     }
     return items;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.city.isNotEmpty) {
+      _current = cities.singleWhere((elem) => elem.id == widget.city);
+    }
   }
 
   @override

@@ -1,16 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BasicDetails {
-  String id;
-  String customer;
-  String photo;
-  String name;
-  String occupation;
-  String fatherName;
-  String adharNumber;
-  bool isSameAsPermanentAddress;
-  String permanentAddress;
-  String temporaryAddress;
+  String id = '';
+  String customer = '';
+  String photo = '';
+  String name = '';
+  String occupation = '';
+  String fatherName = '';
+  String adharNumber = '';
+  bool isSameAsPermanentAddress = false;
+  String permanentAddress = '';
+  String temporaryAddress = '';
   List<String> phone = [];
 
   BasicDetails() {

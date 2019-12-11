@@ -14,8 +14,8 @@ class MyBottomnaviationBar extends StatelessWidget {
       fixedColor: Colors.white,
       items: [
         BottomNavigationBarItem(
-          title: Text('Cancel'),
-          icon: Icon(Icons.cancel),
+          title: Text('Back'),
+          icon: Icon(Icons.navigate_before),
         ),
         BottomNavigationBarItem(
           title: Text('Submit'),

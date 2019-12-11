@@ -48,13 +48,32 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
   List<TextEditingController> _textEditingControllerPhone = [];
 
   File _image;
+  bool isImageChanged = false;
 
   @override
   void initState() {
     super.initState();
     _formKey = widget.formKey;
-    _focusNodePhone.add(FocusNode());
-    _textEditingControllerPhone.add(TextEditingController());
+
+    _textEditingControllerName.text = widget.data.name;
+    _textEditingControllerOccupation.text = widget.data.occupation;
+    _textEditingControllerFatherName.text = widget.data.fatherName;
+    _textEditingControllerAdharNumber.text = widget.data.adharNumber;
+    _textEditingControllerPermanentAddress.text = widget.data.permanentAddress;
+    _textEditingControllerTemporaryAddress.text = widget.data.temporaryAddress;
+    _sameAsPermanentAddress = widget.data.isSameAsPermanentAddress;
+    if (widget.data.phone.length == 0) {
+      _focusNodePhone.add(FocusNode());
+      _textEditingControllerPhone.add(TextEditingController());
+    } else {
+      _focusNodePhone.clear();
+      _textEditingControllerPhone.clear();
+      for (int i = 0; i < widget.data.phone.length; ++i) {
+        _focusNodePhone.add(FocusNode());
+        _textEditingControllerPhone.add(TextEditingController());
+        _textEditingControllerPhone[i].text = widget.data.phone[i];
+      }
+    }
   }
 
   void takePhoto() async {
@@ -62,13 +81,26 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
     setState(() {
       _image = image;
       widget.data.photo = _image.path;
+      isImageChanged = true;
     });
   }
 
   Widget getImage() {
-    if (_image != null) {
+    if (isImageChanged && _image != null) {
       return Image.file(
         _image,
+        width: 200,
+        height: 200,
+      );
+    } else if (widget.data.id.isNotEmpty && widget.data.photo.isNotEmpty) {
+      return Image.network(
+        widget.data.photo,
+        width: 200,
+        height: 200,
+      );
+    } else if (widget.data.id.isEmpty && widget.data.photo.isNotEmpty) {
+      return Image.asset(
+        widget.data.photo,
         width: 200,
         height: 200,
       );
@@ -127,7 +159,11 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
               },
               controller: _textEditingControllerPhone[i],
               onSaved: (val) {
-                widget.data.phone.add(val);
+                if (i >= widget.data.phone.length) {
+                  widget.data.phone.add(val);
+                } else {
+                  widget.data.phone[i] = val;
+                }
               },
               textInputAction: TextInputAction.next,
               keyboardType: TextInputType.number,

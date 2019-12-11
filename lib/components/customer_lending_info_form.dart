@@ -37,7 +37,16 @@ class _CustomerLendingInfoFormState extends State<CustomerLendingInfoForm> {
   void initState() {
     super.initState();
     _formKey = widget.formKey;
-    _textEditingControllerDate.text = Utils.getTodayDate();
+
+    if (widget.data.id.isEmpty) {
+      widget.data.date = DateTime.now();
+    }
+    _textEditingControllerDate.text =
+        Utils.getDateDisplayFormat(widget.data.date);
+    _textEditingControllerAmount.text = widget.data.amount.toString();
+    _textEditingControllerMonths.text = widget.data.months.toString();
+    _textEditingControllerInterestRate.text =
+        widget.data.interestRate.toString();
   }
 
   Widget buildBasicDetails() {
@@ -48,6 +57,7 @@ class _CustomerLendingInfoFormState extends State<CustomerLendingInfoForm> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20.0),
             child: ShowSelectCity(
+              city: widget.data.city,
               onSelected: (value) {
                 widget.data.city = value.id;
               },
@@ -65,7 +75,7 @@ class _CustomerLendingInfoFormState extends State<CustomerLendingInfoForm> {
             },
             controller: _textEditingControllerDate,
             onSaved: (val) {
-              widget.data.date = val;
+              //widget.data.date = val;
             },
             textInputAction: TextInputAction.next,
             onFieldSubmitted: (term) {

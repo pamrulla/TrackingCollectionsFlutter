@@ -4,7 +4,9 @@ import 'package:tracking_collections/components/goto_home_widget.dart';
 import 'package:tracking_collections/components/loading_please_wait.dart';
 import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
+import 'package:tracking_collections/screens/add_customer_screen.dart';
 import 'package:tracking_collections/screens/customer_view_screen.dart';
+import 'package:tracking_collections/screens/duration_bottom_screen.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/globals.dart';
 import 'package:tracking_collections/viewmodels/CustomerList.dart';
@@ -55,14 +57,16 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
         ),
         actions: getAppBarActionsList(),
       ),
-      floatingActionButton: Tooltip(
-        message: "Add New Customer",
-        child: FloatingActionButton(
-          onPressed: () {},
-          child: Icon(Icons.add),
-          backgroundColor: Theme.of(context).accentColor,
-        ),
-      ),
+      floatingActionButton: isHead
+          ? null
+          : Tooltip(
+              message: "Add New Customer",
+              child: FloatingActionButton(
+                onPressed: viewDurationBottomSheet,
+                child: Icon(Icons.add),
+                backgroundColor: Theme.of(context).accentColor,
+              ),
+            ),
       body: FutureBuilder(
           future: DBManager.instance.getCustomerList(currentAgent.id),
           builder: (context, snapshot) {
@@ -154,6 +158,26 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
               return LoadingPleaseWait();
             }
           }),
+    );
+  }
+
+  void viewDurationBottomSheet() async {
+    DurationEnum duration = await showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return DurationBottomScreen();
+      },
+    );
+    if (duration == null) {
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) {
+        return AddCustomerScreen(
+          currentMode: duration,
+        );
+      }),
     );
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tracking_collections/components/EditCustomer.dart';
 import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
 import 'package:tracking_collections/components/goto_home_widget.dart';
 import 'package:tracking_collections/components/loading_please_wait.dart';
@@ -276,6 +277,16 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
     }
   }
 
+  List<Widget> getAppbarActions() {
+    List<Widget> items = [];
+    items.add(EditCustomer(
+      currentCustomer: widget.id,
+    ));
+    items.add(GotoHome());
+    items.add(Logout());
+    return items;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -305,10 +316,7 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
         title: AppbarTitileWithSubtitle(
           title: 'Customer View',
         ),
-        actions: <Widget>[
-          GotoHome(),
-          Logout(),
-        ],
+        actions: getAppbarActions(),
       ),
       floatingActionButton: getFloatingActionButton(),
       body: TabBarView(

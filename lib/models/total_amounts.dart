@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TotalAmounts {
-  String id;
-  String customer;
+  String id = '';
+  String customer = '';
   double totalRepaid = 0;
   double totalPenalty = 0;
 
