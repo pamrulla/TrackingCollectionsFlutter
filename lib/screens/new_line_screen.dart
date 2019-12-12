@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
 import 'package:tracking_collections/components/bottom_navigation_bar.dart';
 import 'package:tracking_collections/components/custom_text_from_field.dart';
@@ -14,7 +15,6 @@ import 'package:tracking_collections/utils/auth.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/globals.dart';
 import 'package:tracking_collections/utils/utils.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class NewLineScreen extends StatefulWidget {
   @override
@@ -131,10 +131,14 @@ class _NewLineScreenState extends State<NewLineScreen> {
                                               icon: Icons.verified_user,
                                               hintText: 'Agent Number',
                                               validator: (value) {
-                                                if (value.isEmpty ||
-                                                    !Utils.isNumeric(value) ||
-                                                    value.length < 10) {
+                                                if (value.isEmpty) {
                                                   return 'Agent Number should not be empty';
+                                                }
+                                                if (!Utils.isNumeric(value)) {
+                                                  return 'Agent Number is invalid';
+                                                }
+                                                if (value.length != 10) {
+                                                  return 'Agent Number should be of 10 digits length';
                                                 }
                                                 return null;
                                               },
@@ -246,15 +250,16 @@ class _NewLineScreenState extends State<NewLineScreen> {
           agent.userId = creds[2];
           isSuccess = await DBManager.instance.addAgent(agent);
           if (isSuccess) {
-            String url = 'sms:' +
-                agent.number +
-                '?body=username: ' +
-                creds[0] +
-                "\npassword: " +
-                creds[1];
-            if (await canLaunch(url)) {
-              await launch(url);
+            String msg = 'username: ' + creds[0] + "\npassword: " + creds[1];
+            if (await FlutterSms.canSendSMS()) {
+              await FlutterSms.sendSMS(message: msg, recipients: [agent.number])
+                  .catchError((e) {
+                isSuccess = false;
+              });
             }
+            //if (await canLaunch(url)) {
+            //  await launch(url);
+            //}
           }
         }
         displayLoading(false);
