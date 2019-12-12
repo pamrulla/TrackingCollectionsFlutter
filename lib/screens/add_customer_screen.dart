@@ -283,10 +283,10 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       } else if (_currentStep == 2) {
         isSuccess = validateDocumentDetails();
         checkProcessStatus(isSuccess);
-      } else if (_currentStep == 3) {
+      } else if (_currentStep % 2 == 1) {
         isSuccess = validateSecurityBasicDetails();
         checkProcessStatus(isSuccess);
-      } else if (_currentStep == 4) {
+      } else if (_currentStep % 2 == 0) {
         isSuccess = validateSecurityDocumentDetails();
         checkProcessStatus(isSuccess);
       }
@@ -387,15 +387,20 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     }
   }
 
-  void checkProcessStatus(bool isSuccess) {
+  void checkProcessStatus(bool isSuccess) async {
     displayLoading(false);
     if (isSuccess == true) {
       Utils.showSuccessSnackBar(globalKey, text: "Successfully Validated...");
-      _currentStep += 1;
-      if (_formWidgets.length == _currentStep) {
-        updateData();
+      if (_formWidgets.length == (_currentStep + 1)) {
+        if (await isToAddNewSecurity()) {
+          addNewSecurity();
+        } else {
+          updateData();
+        }
       } else {
-        setState(() {});
+        setState(() {
+          _currentStep += 1;
+        });
       }
     } else {
       Utils.showErrorSnackBar(globalKey);
@@ -433,5 +438,73 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       }
       _previousSecurityDocuments.add(docs);
     }
+  }
+
+  Future<bool> isToAddNewSecurity() async {
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Choose...',
+            style: TextStyle(
+              color: Colors.amberAccent,
+            ),
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Add new Surity person?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            FlatButton(
+              child: Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void addNewSecurity() {
+    int currentCount = _securities.length;
+    _subTitles.add("Security " + currentCount.toString() + ": Basic Details");
+    _subTitles.add("Security " + currentCount.toString() + ": Documents");
+
+    int keyIndex = keys.length;
+
+    keys.add(GlobalKey<FormState>());
+    keys.add(GlobalKey<FormState>());
+    _securities.add(BasicDetails());
+    _securitiesDocs.add(Documents());
+
+    _formWidgets.add(CustomerBasicDetailsForm(
+      formKey: keys[keyIndex],
+      onBack: onBack,
+      onContinue: onContinue,
+      data: _securities[currentCount],
+    ));
+    keyIndex += 1;
+    _formWidgets.add(CustomerDocumentForm(
+      formKey: keys[keyIndex],
+      onBack: onBack,
+      onContinue: onContinue,
+      data: _securitiesDocs[currentCount],
+    ));
+
+    _currentStep += 1;
+    setState(() {});
   }
 }

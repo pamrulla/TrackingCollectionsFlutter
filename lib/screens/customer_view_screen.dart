@@ -51,7 +51,7 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
   }
 
   void onEdit(bool isUpdated) {
-    if (isUpdated) {
+    if (isUpdated != null && isUpdated) {
       setState(() {
         _customerBasicDetailsFuture =
             DBManager.instance.getCustomerBasicDetails(widget.id);
