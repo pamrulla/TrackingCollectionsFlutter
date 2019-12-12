@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tracking_collections/components/Refresh.dart';
 import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
 import 'package:tracking_collections/components/goto_home_widget.dart';
 import 'package:tracking_collections/components/loading_please_wait.dart';
@@ -36,11 +37,18 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
     }
   }
 
+  void onRefresh() async {
+    setState(() {});
+  }
+
   List<Widget> getAppBarActionsList() {
     List<Widget> items = [];
     if (Navigator.canPop(context)) {
       items.add(GotoHome());
     }
+    items.add(Refresh(
+      onRefresh: onRefresh,
+    ));
     items.add(Logout());
     return items;
   }

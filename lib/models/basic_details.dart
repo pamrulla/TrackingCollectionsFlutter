@@ -49,6 +49,7 @@ class BasicDetails {
     id = map.documentID;
     photo = map['photo'];
     name = map['name'];
+    customer = map['customer'];
     occupation = map['occupation'];
     fatherName = map['fatherName'];
     adharNumber = map['adharNumber'];
@@ -58,6 +59,5 @@ class BasicDetails {
     map['phone'].forEach((d) {
       phone.add(d);
     });
-    //phone = map['phone'];
   }
 }

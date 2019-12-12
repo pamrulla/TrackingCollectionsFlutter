@@ -4,7 +4,8 @@ import 'package:tracking_collections/utils/constants.dart';
 
 class EditCustomer extends StatelessWidget {
   final String currentCustomer;
-  EditCustomer({@required this.currentCustomer});
+  final Function onEdit;
+  EditCustomer({@required this.currentCustomer, @required this.onEdit});
 
   @override
   Widget build(BuildContext context) {
@@ -13,8 +14,8 @@ class EditCustomer extends StatelessWidget {
         Icons.edit,
         color: Theme.of(context).iconTheme.color,
       ),
-      onPressed: () {
-        Navigator.push(
+      onPressed: () async {
+        bool isUpdated = await Navigator.push(
           context,
           MaterialPageRoute(builder: (context) {
             return AddCustomerScreen(
@@ -23,6 +24,7 @@ class EditCustomer extends StatelessWidget {
             );
           }),
         );
+        onEdit(isUpdated);
       },
     );
   }

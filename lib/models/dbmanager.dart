@@ -410,4 +410,60 @@ class DBManager {
 
     return ret;
   }
+
+  Future<bool> performUpdateCustomer(
+      BasicDetails basicDetails,
+      LendingInfo lendingInfo,
+      Documents documents,
+      List<BasicDetails> securities,
+      List<Documents> securitiesDocs) async {
+    bool ret = true;
+
+    WriteBatch batch = Firestore.instance.batch();
+
+    DocumentReference bd = Firestore.instance
+        .collection(basicDetailsCollection)
+        .document(basicDetails.id);
+    batch.updateData(bd, basicDetails.toMap());
+
+    DocumentReference li = Firestore.instance
+        .collection(lendingInfoCollection)
+        .document(lendingInfo.id);
+    batch.updateData(li, lendingInfo.toMap());
+
+    DocumentReference dd = Firestore.instance
+        .collection(documentsCollection)
+        .document(documents.id);
+    batch.setData(dd, documents.toMap());
+
+    for (int i = 0; i < securities.length; ++i) {
+      if (securities[i].id.isEmpty) {
+        securities[i].customer = bd.documentID;
+        DocumentReference sd =
+            Firestore.instance.collection(basicDetailsCollection).document();
+        batch.setData(sd, securities[i].toMap());
+
+        securitiesDocs[i].customer = sd.documentID;
+        DocumentReference sdd =
+            Firestore.instance.collection(documentsCollection).document();
+        batch.setData(sdd, securitiesDocs[i].toMap());
+      } else {
+        DocumentReference sd = Firestore.instance
+            .collection(basicDetailsCollection)
+            .document(securities[i].id);
+        batch.updateData(sd, securities[i].toMap());
+
+        DocumentReference sdd = Firestore.instance
+            .collection(documentsCollection)
+            .document(securitiesDocs[i].id);
+        batch.updateData(sdd, securitiesDocs[i].toMap());
+      }
+    }
+
+    await batch.commit().catchError((e) {
+      ret = false;
+    });
+
+    return ret;
+  }
 }

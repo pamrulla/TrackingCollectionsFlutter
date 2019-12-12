@@ -50,6 +50,17 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
     super.dispose();
   }
 
+  void onEdit(bool isUpdated) {
+    if (isUpdated) {
+      setState(() {
+        _customerBasicDetailsFuture =
+            DBManager.instance.getCustomerBasicDetails(widget.id);
+        _securityBasicDetailsFuture =
+            DBManager.instance.getSecurityDetails(widget.id);
+      });
+    }
+  }
+
   Widget getBasicDetails(CustomerBasicDetails cbd, {bool isMain = true}) {
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(),
@@ -281,6 +292,7 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
     List<Widget> items = [];
     items.add(EditCustomer(
       currentCustomer: widget.id,
+      onEdit: onEdit,
     ));
     items.add(GotoHome());
     items.add(Logout());

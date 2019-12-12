@@ -14,6 +14,7 @@ import 'package:tracking_collections/models/lending_info.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/globals.dart';
 import 'package:tracking_collections/utils/utils.dart';
+import 'package:tracking_collections/viewmodels/CustomerBasicDetails.dart';
 
 class AddCustomerScreen extends StatefulWidget {
   final DurationEnum currentMode;
@@ -34,8 +35,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     "Add Lending Info",
     "Documents",
     "Security 1: Basic Details",
-    "Security 1: Documents",
-    ""
+    "Security 1: Documents"
   ];
   List<GlobalKey<FormState>> keys = [];
 
@@ -45,12 +45,17 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
   List<BasicDetails> _securities = [];
   List<Documents> _securitiesDocs = [];
 
+  String _previousCustomerPhoto = '';
+  List<String> _previousCustomerDocuments = [];
+  List<String> _previousSecurityPhoto = [];
+  List<List<String>> _previousSecurityDocuments = [];
+
   void initSettings() async {
     displayLoading(true);
-    if (widget.currentCustomer.isEmpty) {
-      newCustomerBasicSettings();
-    } else {
+    if (isEditMode()) {
       await editCustomerBasicSettings();
+    } else {
+      newCustomerBasicSettings();
     }
     displayLoading(false);
   }
@@ -60,9 +65,27 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
   }
 
   Future<void> editCustomerBasicSettings() async {
-    _lendingInfo.city = cities[0].id;
-    _securities.add(BasicDetails());
-    _securitiesDocs.add(Documents());
+    CustomerBasicDetails _customerBasicDetailsFuture = await DBManager.instance
+        .getCustomerBasicDetails(widget.currentCustomer);
+    List<CustomerBasicDetails> _securityBasicDetailsFuture =
+        await DBManager.instance.getSecurityDetails(widget.currentCustomer);
+
+    _basicDetails = _customerBasicDetailsFuture.basicDetails;
+    _lendingInfo = _customerBasicDetailsFuture.lendingInfo;
+    _documents = _customerBasicDetailsFuture.documents;
+    _securities.clear();
+    _securitiesDocs.clear();
+    for (int i = 0; i < _securityBasicDetailsFuture.length; ++i) {
+      _securities.add(_securityBasicDetailsFuture[i].basicDetails);
+      _securitiesDocs.add(_securityBasicDetailsFuture[i].documents);
+    }
+
+    if (_securities.length > 1) {
+      for (int i = 1; i < _securities.length; ++i) {
+        _subTitles.add("Security " + (i + 1).toString() + ": Basic Details");
+        _subTitles.add("Security " + (i + 1).toString() + ": Documents");
+      }
+    }
 
     for (int i = 0; i < _subTitles.length; ++i) {
       keys.add(GlobalKey<FormState>());
@@ -86,18 +109,24 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       onContinue: onContinue,
       data: _documents,
     ));
-    _formWidgets.add(CustomerBasicDetailsForm(
-      formKey: keys[3],
-      onBack: onBack,
-      onContinue: onContinue,
-      data: _securities[0],
-    ));
-    _formWidgets.add(CustomerDocumentForm(
-      formKey: keys[4],
-      onBack: onBack,
-      onContinue: onContinue,
-      data: _securitiesDocs[0],
-    ));
+    int keyIndex = 3;
+    for (int i = 0; i < _securities.length; ++i) {
+      _formWidgets.add(CustomerBasicDetailsForm(
+        formKey: keys[keyIndex],
+        onBack: onBack,
+        onContinue: onContinue,
+        data: _securities[i],
+      ));
+      keyIndex += 1;
+      _formWidgets.add(CustomerDocumentForm(
+        formKey: keys[keyIndex],
+        onBack: onBack,
+        onContinue: onContinue,
+        data: _securitiesDocs[i],
+      ));
+    }
+
+    updatePreviousInfo();
   }
 
   void newCustomerBasicSettings() {
@@ -149,10 +178,13 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String currentSubTitle = _subTitles[_currentStep];
-    int cs = _currentStep + 1;
-    currentSubTitle +=
-        " (" + cs.toString() + "/" + _formWidgets.length.toString() + ")";
+    String currentSubTitle = "";
+    if (_currentStep < _subTitles.length) {
+      currentSubTitle = _subTitles[_currentStep];
+      int cs = _currentStep + 1;
+      currentSubTitle +=
+          " (" + cs.toString() + "/" + _formWidgets.length.toString() + ")";
+    }
     return Scaffold(
       key: globalKey,
       appBar: AppBar(
@@ -262,39 +294,72 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
   }
 
   Future<bool> uploadAllImages() async {
-    //Customer Photo
-    String url = await uploadAndGetUrl(_basicDetails.photo);
-    if (url.isEmpty) {
-      return false;
-    }
-    _basicDetails.photo = url;
+    bool isChanged = true;
+    String url = '';
 
-    //Customer documents
-    for (int i = 0; i < _documents.documentProofs.length; ++i) {
-      url = await uploadAndGetUrl(_documents.documentProofs[i]);
+    //Customer Photo
+    isChanged = _basicDetails.photo != _previousCustomerPhoto;
+    if (isChanged) {
+      url = await uploadAndGetUrl(_basicDetails.photo);
       if (url.isEmpty) {
         return false;
       }
-      _documents.documentProofs[i] = url;
+      _basicDetails.photo = url;
+    }
+
+    //Customer documents
+    for (int i = 0; i < _documents.documentProofs.length; ++i) {
+      if (i < _previousCustomerDocuments.length) {
+        isChanged =
+            _documents.documentProofs[i] != _previousCustomerDocuments[i];
+      } else {
+        isChanged = true;
+      }
+      if (isChanged) {
+        url = await uploadAndGetUrl(_documents.documentProofs[i]);
+        if (url.isEmpty) {
+          return false;
+        }
+        _documents.documentProofs[i] = url;
+      }
     }
 
     //Security Photo
     for (int i = 0; i < _securities.length; ++i) {
-      url = await uploadAndGetUrl(_securities[i].photo);
-      if (url.isEmpty) {
-        return false;
+      if (i < _previousSecurityPhoto.length) {
+        isChanged = _securities[i].photo != _previousSecurityPhoto[i];
+      } else {
+        isChanged = true;
       }
-      _securities[i].photo = url;
+      if (isChanged) {
+        url = await uploadAndGetUrl(_securities[i].photo);
+        if (url.isEmpty) {
+          return false;
+        }
+        _securities[i].photo = url;
+      }
     }
 
     //Security Documents
     for (int j = 0; j < _securitiesDocs.length; ++j) {
       for (int i = 0; i < _securitiesDocs[j].documentProofs.length; ++i) {
-        url = await uploadAndGetUrl(_securitiesDocs[j].documentProofs[i]);
-        if (url.isEmpty) {
-          return false;
+        if (j < _previousSecurityDocuments.length) {
+          if (i < _previousSecurityDocuments[j].length) {
+            isChanged = _securitiesDocs[j].documentProofs[i] !=
+                _previousSecurityDocuments[j][i];
+          } else {
+            isChanged = true;
+          }
+        } else {
+          isChanged = true;
         }
-        _securitiesDocs[j].documentProofs[i] = url;
+        if (isChanged) {
+          url = await uploadAndGetUrl(_securitiesDocs[j].documentProofs[i]);
+          if (url.isEmpty) {
+            return false;
+          }
+          _securitiesDocs[j].documentProofs[i] = url;
+        }
       }
     }
 
@@ -304,11 +369,17 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
   void updateData() async {
     displayLoading(true);
     bool ret = await uploadAllImages();
-    ret = ret &&
-        await DBManager.instance.performAddCustomer(_basicDetails, _lendingInfo,
-            _documents, _securities, _securitiesDocs);
+    if (isEditMode()) {
+      ret = ret &&
+          await DBManager.instance.performUpdateCustomer(_basicDetails,
+              _lendingInfo, _documents, _securities, _securitiesDocs);
+    } else {
+      ret = ret &&
+          await DBManager.instance.performAddCustomer(_basicDetails,
+              _lendingInfo, _documents, _securities, _securitiesDocs);
+    }
     if (ret) {
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     } else {
       _currentStep -= 1;
       displayLoading(false);
@@ -346,6 +417,21 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       onBack();
     } else {
       onContinue();
+    }
+  }
+
+  void updatePreviousInfo() {
+    _previousCustomerPhoto = _basicDetails.photo;
+    for (int i = 0; i < _documents.documentProofs.length; ++i) {
+      _previousCustomerDocuments.add(_documents.documentProofs[i]);
+    }
+    for (int i = 0; i < _securities.length; ++i) {
+      _previousSecurityPhoto.add(_securities[i].photo);
+      List<String> docs = [];
+      for (int j = 0; j < _securitiesDocs[i].documentProofs.length; ++j) {
+        docs.add(_securitiesDocs[i].documentProofs[j]);
+      }
+      _previousSecurityDocuments.add(docs);
     }
   }
 }
