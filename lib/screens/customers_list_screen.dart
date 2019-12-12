@@ -15,7 +15,8 @@ import 'package:tracking_collections/viewmodels/CustomerList.dart';
 
 class CustomersListScreen extends StatefulWidget {
   final Agent agent;
-  CustomersListScreen({this.agent});
+  final DurationEnum currentDuration;
+  CustomersListScreen({@required this.agent, @required this.currentDuration});
 
   @override
   _CustomersListScreenState createState() => _CustomersListScreenState();
@@ -80,7 +81,8 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
       ),
       body: FutureBuilder(
           future: DBManager.instance.getCustomerList(
-              widget.agent == null ? currentAgent.id : widget.agent.id),
+              widget.agent == null ? currentAgent.id : widget.agent.id,
+              widget.currentDuration),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               customers = snapshot.data;

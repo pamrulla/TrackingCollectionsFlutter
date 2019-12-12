@@ -6,7 +6,6 @@ import 'package:tracking_collections/components/loading_please_wait.dart';
 import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/models/agent.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
-import 'package:tracking_collections/screens/add_customer_screen.dart';
 import 'package:tracking_collections/screens/customers_list_screen.dart';
 import 'package:tracking_collections/screens/duration_bottom_screen.dart';
 import 'package:tracking_collections/utils/constants.dart';
@@ -163,17 +162,11 @@ class _AgentListScreenState extends State<AgentListScreen> {
       return;
     }
     if (action == agentListActionsEnum.CustomersList) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) {
-            return CustomersListScreen(agent: agent);
-          },
-        ),
-      );
-    } else if (action == agentListActionsEnum.NewCustomer) {
       viewDurationBottomSheet(agent);
-    } else if (action == agentListActionsEnum.CallAgent) {
+    } /*else if (action == agentListActionsEnum.NewCustomer) {
+      viewDurationBottomSheet(agent);
+    } */
+    else if (action == agentListActionsEnum.CallAgent) {
       String url = 'tel:' + agent.number;
       if (await canLaunch(url)) {
         await launch(url);
@@ -195,12 +188,23 @@ class _AgentListScreenState extends State<AgentListScreen> {
     }
     Navigator.push(
       context,
+      MaterialPageRoute(
+        builder: (context) {
+          return CustomersListScreen(
+            agent: agent,
+            currentDuration: duration,
+          );
+        },
+      ),
+    );
+    /*Navigator.push(
+      context,
       MaterialPageRoute(builder: (context) {
         return AddCustomerScreen(
           currentMode: duration,
           agent: agent.id,
         );
       }),
-    );
+    );*/
   }
 }
