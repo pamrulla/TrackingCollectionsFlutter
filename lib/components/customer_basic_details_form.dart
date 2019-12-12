@@ -152,8 +152,12 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
               icon: Icons.verified_user,
               hintText: 'Phone Number',
               validator: (value) {
-                if (value.isEmpty || !Utils.isNumeric(value)) {
+                if (value.isEmpty) {
                   return 'Phone Number should not be empty';
+                } else if (!Utils.isNumeric(value)) {
+                  return 'Phone Number should contain digits 0-9';
+                } else if (value.length != 10) {
+                  return 'Invalid Phone Number, should be 10 digits long';
                 }
                 return null;
               },
@@ -261,8 +265,12 @@ class _CustomerBasicDetailsFormState extends State<CustomerBasicDetailsForm> {
             icon: Icons.verified_user,
             hintText: 'Adhar Number',
             validator: (value) {
-              if (value.isEmpty || !Utils.isNumeric(value)) {
+              if (value.isEmpty) {
                 return 'Adhar Number should not be empty';
+              } else if (!Utils.isNumeric(value)) {
+                return 'Adhar Number should contain digits 0-9';
+              } else if (value.length != 12) {
+                return 'Invalid Adhar Number, should be 12 digits long';
               }
               return null;
             },

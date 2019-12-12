@@ -92,6 +92,11 @@ class _CustomerLendingInfoFormState extends State<CustomerLendingInfoForm> {
                 return 'Lending Amount should not be empty';
               } else if (!Utils.isNumeric(value)) {
                 return 'Lending Amount is invalid';
+              } else {
+                double val = double.parse(value);
+                if (val <= 0) {
+                  return 'Lending Amount should be greater than zero.';
+                }
               }
               return null;
             },
@@ -115,6 +120,11 @@ class _CustomerLendingInfoFormState extends State<CustomerLendingInfoForm> {
                 return 'Months should not be empty';
               } else if (!Utils.isNumeric(value)) {
                 return 'Months is invalid';
+              } else {
+                double val = double.parse(value);
+                if (val <= 0) {
+                  return 'Months should be greater than zero.';
+                }
               }
               return null;
             },
@@ -138,6 +148,11 @@ class _CustomerLendingInfoFormState extends State<CustomerLendingInfoForm> {
                 return 'Interest Rate should not be empty';
               } else if (!Utils.isNumeric(value)) {
                 return 'Interest Rate is invalid';
+              } else {
+                double val = double.parse(value);
+                if (val <= 0) {
+                  return 'Interest Rate should be greater than zero.';
+                }
               }
               return null;
             },

@@ -4,6 +4,7 @@ import 'package:tracking_collections/components/loading_please_wait.dart';
 import 'package:tracking_collections/components/myRaisedButton.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/models/transaction.dart';
+import 'package:tracking_collections/utils/globals.dart';
 import 'package:tracking_collections/utils/utils.dart';
 
 class AmountRecieveBottomScreen extends StatefulWidget {
@@ -38,8 +39,7 @@ class _AmountRecieveBottomScreenState extends State<AmountRecieveBottomScreen> {
     trans.customer = widget.customer;
     trans.amount = 0;
     trans.date = DateTime.now();
-    //TODO Agent
-    trans.agent = '';
+    trans.agent = currentAgent.id;
     trans.type = widget.title.contains('Penalty') ? 1 : 0;
     _textEditingControllerDate.text = Utils.getDateDisplayFormat(trans.date);
   }
@@ -112,7 +112,12 @@ class _AmountRecieveBottomScreenState extends State<AmountRecieveBottomScreen> {
                                       if (value.isEmpty) {
                                         return 'Amount should not be empty';
                                       } else if (!Utils.isNumeric(value)) {
-                                        return 'Amount is invalid';
+                                        return 'Amount should be a number';
+                                      } else {
+                                        double val = double.parse(value);
+                                        if (val <= 0) {
+                                          return 'Amount should be more than zero';
+                                        }
                                       }
                                       return null;
                                     },
