@@ -8,11 +8,13 @@ import 'package:tracking_collections/models/agent.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/screens/add_customer_screen.dart';
 import 'package:tracking_collections/screens/customers_list_screen.dart';
+import 'package:tracking_collections/screens/duration_bottom_screen.dart';
 import 'package:tracking_collections/utils/constants.dart';
+import 'package:tracking_collections/utils/globals.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AgentListScreen extends StatefulWidget {
-  final DurationEnum currentDurationType;
-  AgentListScreen({this.currentDurationType});
+  AgentListScreen();
 
   @override
   _AgentListScreenState createState() => _AgentListScreenState();
@@ -24,7 +26,7 @@ class _AgentListScreenState extends State<AgentListScreen> {
   bool sort = false;
   @override
   void initState() {
-    agentsFuture = DBManager.instance.getAgentsList(widget.currentDurationType);
+    agentsFuture = DBManager.instance.getAgentsList();
     super.initState();
   }
 
@@ -46,8 +48,7 @@ class _AgentListScreenState extends State<AgentListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String subTitle =
-        durations[DurationEnum.values.indexOf(widget.currentDurationType)];
+    String subTitle = currentAgent.name;
     return Scaffold(
       appBar: AppBar(
         title: AppbarTitileWithSubtitle(
@@ -64,6 +65,9 @@ class _AgentListScreenState extends State<AgentListScreen> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             agents = snapshot.data;
+            if (agents[0].id != currentAgent.id) {
+              agents.insert(0, currentAgent);
+            }
             if (agents.length == 0) {
               return Center(
                 child: Text('No Agents assigned'),
@@ -114,19 +118,21 @@ class _AgentListScreenState extends State<AgentListScreen> {
                                               (elem) => elem.id == agent.city)
                                           .name),
                                       onTap: () {
-                                        viewDurationBottomSheet(agent);
+                                        viewActionsBottomSheet(agent);
                                       },
                                     ),
                                     DataCell(
-                                      Text(agent.name),
+                                      Text(agent.id == currentAgent.id
+                                          ? 'You'
+                                          : agent.name),
                                       onTap: () {
-                                        viewDurationBottomSheet(agent);
+                                        viewActionsBottomSheet(agent);
                                       },
                                     ),
                                     DataCell(
                                       Text(agent.number),
                                       onTap: () {
-                                        viewDurationBottomSheet(agent);
+                                        viewActionsBottomSheet(agent);
                                       },
                                     ),
                                   ],
@@ -146,7 +152,7 @@ class _AgentListScreenState extends State<AgentListScreen> {
     );
   }
 
-  void viewDurationBottomSheet(Agent agent) async {
+  void viewActionsBottomSheet(Agent agent) async {
     agentListActionsEnum action = await showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -161,19 +167,40 @@ class _AgentListScreenState extends State<AgentListScreen> {
         context,
         MaterialPageRoute(
           builder: (context) {
-            return CustomersListScreen();
+            return CustomersListScreen(agent: agent);
           },
         ),
       );
     } else if (action == agentListActionsEnum.NewCustomer) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) {
-          return AddCustomerScreen(
-            currentMode: widget.currentDurationType,
-          );
-        }),
-      );
+      viewDurationBottomSheet(agent);
+    } else if (action == agentListActionsEnum.CallAgent) {
+      String url = 'tel:' + agent.number;
+      if (await canLaunch(url)) {
+        await launch(url);
+      } else {
+        throw 'Could not launch $url';
+      }
     }
+  }
+
+  void viewDurationBottomSheet(Agent agent) async {
+    DurationEnum duration = await showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return DurationBottomScreen();
+      },
+    );
+    if (duration == null) {
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) {
+        return AddCustomerScreen(
+          currentMode: duration,
+          agent: agent.id,
+        );
+      }),
+    );
   }
 }

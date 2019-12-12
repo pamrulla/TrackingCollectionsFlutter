@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:tracking_collections/components/EditCustomer.dart';
 import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
@@ -10,9 +11,11 @@ import 'package:tracking_collections/models/transaction.dart';
 import 'package:tracking_collections/screens/amount_recieve_bottom_screen.dart';
 import 'package:tracking_collections/screens/image_viewer_screen.dart';
 import 'package:tracking_collections/utils/constants.dart';
+import 'package:tracking_collections/utils/globals.dart';
 import 'package:tracking_collections/utils/utils.dart';
 import 'package:tracking_collections/viewmodels/CustomerBasicDetails.dart';
 import 'package:tracking_collections/viewmodels/TransactionDetails.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CustomerViewScreen extends StatefulWidget {
   final String id;
@@ -86,8 +89,11 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
               },
               child: Hero(
                 tag: cbd.basicDetails.photo,
-                child: Image.network(
-                  cbd.basicDetails.photo,
+                child: CachedNetworkImage(
+                  imageUrl: cbd.basicDetails.photo,
+                  placeholder: (context, url) =>
+                      Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
                   width: 100,
                   height: 100,
                 ),
@@ -138,9 +144,17 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
   List<Widget> getPhoneNumbers(List<String> phones) {
     List<Widget> items = [];
     for (int i = 0; i < phones.length; ++i) {
-      items.add(TableRow(
-        'Phone ' + (i + 1).toString(),
-        phones[i],
+      items.add(GestureDetector(
+        onTap: () async {
+          String url = 'tel:' + phones[i];
+          if (await canLaunch(url)) {
+            await launch(url);
+          }
+        },
+        child: TableRow(
+          'Phone ' + (i + 1).toString(),
+          phones[i],
+        ),
       ));
       items.add(Divider());
     }
@@ -290,10 +304,12 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
 
   List<Widget> getAppbarActions() {
     List<Widget> items = [];
-    items.add(EditCustomer(
-      currentCustomer: widget.id,
-      onEdit: onEdit,
-    ));
+    if (isHead) {
+      items.add(EditCustomer(
+        currentCustomer: widget.id,
+        onEdit: onEdit,
+      ));
+    }
     items.add(GotoHome());
     items.add(Logout());
     return items;

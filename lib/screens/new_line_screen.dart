@@ -10,8 +10,11 @@ import 'package:tracking_collections/components/show_select_city.dart';
 import 'package:tracking_collections/models/agent.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/screens/add_customer_screen.dart';
+import 'package:tracking_collections/utils/auth.dart';
 import 'package:tracking_collections/utils/constants.dart';
+import 'package:tracking_collections/utils/globals.dart';
 import 'package:tracking_collections/utils/utils.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NewLineScreen extends StatefulWidget {
   @override
@@ -38,26 +41,6 @@ class _NewLineScreenState extends State<NewLineScreen> {
     _textEditingControllerAgentName.clear();
     _textEditingControllerAgentNumber.clear();
     agent.city = cities[0].id;
-  }
-
-  List<ListTile> getDurationRadioButtons() {
-    List<ListTile> radioButtons = [];
-    for (int i = 0; i < DurationEnum.values.length; ++i) {
-      ListTile lt = ListTile(
-        title: Text(durations[i]),
-        leading: Radio(
-          value: DurationEnum.values[i],
-          groupValue: _duration,
-          onChanged: (DurationEnum value) {
-            setState(() {
-              _duration = value;
-            });
-          },
-        ),
-      );
-      radioButtons.add(lt);
-    }
-    return radioButtons;
   }
 
   @override
@@ -95,15 +78,6 @@ class _NewLineScreenState extends State<NewLineScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  FormSubHeadingText(
-                                    text: 'Select Duration:',
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      children: getDurationRadioButtons(),
-                                    ),
-                                  ),
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: ShowSelectCity(
@@ -262,10 +236,31 @@ class _NewLineScreenState extends State<NewLineScreen> {
       if (_formKey.currentState.validate()) {
         displayLoading(true);
         _formKey.currentState.save();
-        bool isSuccess = await DBManager.instance.addAgent(agent);
+        agent.head = currentAgent.id;
+        agent.role = 'agent';
+        List<String> creds = await Authorization().createAgentLogin(agent.name);
+        bool isSuccess = true;
+        if (creds.length != 3) {
+          isSuccess = false;
+        } else {
+          agent.userId = creds[2];
+          isSuccess = await DBManager.instance.addAgent(agent);
+          if (isSuccess) {
+            String url = 'sms:' +
+                agent.number +
+                '?body=username: ' +
+                creds[0] +
+                "\npassword: " +
+                creds[1];
+            if (await canLaunch(url)) {
+              await launch(url);
+            }
+          }
+        }
         displayLoading(false);
         if (isSuccess) {
-          await onSuccess();
+          Navigator.pop(context);
+          //await onSuccess();
         } else {
           Utils.showErrorSnackBar(globalKey);
         }

@@ -4,6 +4,7 @@ import 'package:tracking_collections/components/appbar_title_with_subtitle.dart'
 import 'package:tracking_collections/components/goto_home_widget.dart';
 import 'package:tracking_collections/components/loading_please_wait.dart';
 import 'package:tracking_collections/components/logout_widget.dart';
+import 'package:tracking_collections/models/agent.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/screens/add_customer_screen.dart';
 import 'package:tracking_collections/screens/customer_view_screen.dart';
@@ -13,7 +14,8 @@ import 'package:tracking_collections/utils/globals.dart';
 import 'package:tracking_collections/viewmodels/CustomerList.dart';
 
 class CustomersListScreen extends StatefulWidget {
-  CustomersListScreen();
+  final Agent agent;
+  CustomersListScreen({this.agent});
 
   @override
   _CustomersListScreenState createState() => _CustomersListScreenState();
@@ -56,6 +58,9 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
   @override
   Widget build(BuildContext context) {
     String subTitle = currentAgent.name;
+    if (isHead) {
+      subTitle += " : " + widget.agent.name;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -65,18 +70,17 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
         ),
         actions: getAppBarActionsList(),
       ),
-      floatingActionButton: isHead
-          ? null
-          : Tooltip(
-              message: "Add New Customer",
-              child: FloatingActionButton(
-                onPressed: viewDurationBottomSheet,
-                child: Icon(Icons.add),
-                backgroundColor: Theme.of(context).accentColor,
-              ),
-            ),
+      floatingActionButton: Tooltip(
+        message: "Add New Customer",
+        child: FloatingActionButton(
+          onPressed: viewDurationBottomSheet,
+          child: Icon(Icons.add),
+          backgroundColor: Theme.of(context).accentColor,
+        ),
+      ),
       body: FutureBuilder(
-          future: DBManager.instance.getCustomerList(currentAgent.id),
+          future: DBManager.instance.getCustomerList(
+              widget.agent == null ? currentAgent.id : widget.agent.id),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               customers = snapshot.data;

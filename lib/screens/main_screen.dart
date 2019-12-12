@@ -3,9 +3,7 @@ import 'package:tracking_collections/components/appbar_title_with_subtitle.dart'
 import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/components/myIconRaisedButton.dart';
 import 'package:tracking_collections/screens/agent_list_screen.dart';
-import 'package:tracking_collections/screens/duration_bottom_screen.dart';
 import 'package:tracking_collections/screens/new_line_screen.dart';
-import 'package:tracking_collections/utils/constants.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -66,7 +64,14 @@ class _MainScreenState extends State<MainScreen> {
                     Icons.layers,
                     size: 40.0,
                   ),
-                  onPressed: viewDurationBottomSheet,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) {
+                        return AgentListScreen();
+                      }),
+                    );
+                  },
                 ),
               ),
               Spacer(),
@@ -74,26 +79,6 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  void viewDurationBottomSheet() async {
-    DurationEnum duration = await showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return DurationBottomScreen();
-      },
-    );
-    if (duration == null) {
-      return;
-    }
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) {
-        return AgentListScreen(
-          currentDurationType: duration,
-        );
-      }),
     );
   }
 }

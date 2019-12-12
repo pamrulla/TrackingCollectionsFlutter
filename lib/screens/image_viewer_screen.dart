@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
 import 'package:tracking_collections/components/goto_home_widget.dart';
@@ -25,7 +26,12 @@ class ImageViewer extends StatelessWidget {
           children: <Widget>[
             Expanded(
               child: Hero(
-                child: Image.network(img),
+                child: CachedNetworkImage(
+                  imageUrl: img,
+                  placeholder: (context, url) =>
+                      Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                ),
                 tag: img,
               ),
             )

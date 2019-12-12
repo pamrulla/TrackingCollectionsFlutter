@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:random_string/random_string.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/globals.dart';
@@ -27,8 +28,6 @@ class Authorization {
     bool ret = true;
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
     await user.updatePassword(password).catchError((e) {
-      print('khan');
-      print(e);
       ret = false;
     });
     if (ret) {
@@ -36,5 +35,28 @@ class Authorization {
       await DBManager.instance.updateAgent(currentAgent);
     }
     return ret;
+  }
+
+  Future<List<String>> createAgentLogin(String name) async {
+    List<String> creds = [];
+    bool isSucceeded = true;
+    String newName = name.replaceAll(' ', '.');
+    String password = randomNumeric(6);
+    do {
+      String userName = newName + userNameTail;
+      isSucceeded = true;
+      AuthResult res = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: userName, password: password)
+          .catchError((e) {
+        isSucceeded = false;
+        newName += randomNumeric(1);
+      });
+      if (isSucceeded && res != null) {
+        creds.add(newName);
+        creds.add(password);
+        creds.add(res.user.uid);
+      }
+    } while (!isSucceeded);
+    return creds;
   }
 }

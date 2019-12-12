@@ -19,7 +19,9 @@ import 'package:tracking_collections/viewmodels/CustomerBasicDetails.dart';
 class AddCustomerScreen extends StatefulWidget {
   final DurationEnum currentMode;
   final String currentCustomer;
-  AddCustomerScreen({this.currentMode, this.currentCustomer = ''});
+  final String agent;
+  AddCustomerScreen(
+      {this.currentMode, this.currentCustomer = '', this.agent = ''});
 
   @override
   _AddCustomerScreenState createState() => _AddCustomerScreenState();
@@ -237,7 +239,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
 
   bool validateLendingInfo() {
     _lendingInfo.durationType = DurationEnum.values.indexOf(widget.currentMode);
-    _lendingInfo.agent = currentAgent.id;
+    _lendingInfo.agent = widget.agent.isEmpty ? currentAgent.id : widget.agent;
     return true;
   }
 

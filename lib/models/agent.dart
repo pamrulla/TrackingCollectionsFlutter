@@ -8,6 +8,7 @@ class Agent {
   String userId = '';
   String role = '';
   bool isFirstTime = true;
+  String head = '';
 
   Map<String, dynamic> toMap() {
     return {
@@ -17,6 +18,7 @@ class Agent {
       'userId': userId,
       'role': role,
       'isFirstTime': isFirstTime,
+      'head': head,
     };
   }
 
@@ -28,6 +30,7 @@ class Agent {
     userId = map['userId'];
     role = map['role'];
     isFirstTime = map['isFirstTime'];
+    head = map['head'];
   }
 
   void fromDocument(DocumentSnapshot doc) {
@@ -38,5 +41,6 @@ class Agent {
     userId = doc['userId'];
     role = doc['role'];
     isFirstTime = doc['isFirstTime'];
+    head = doc['head'];
   }
 }

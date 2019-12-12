@@ -13,6 +13,7 @@ import 'package:tracking_collections/models/lending_info.dart';
 import 'package:tracking_collections/models/total_amounts.dart';
 import 'package:tracking_collections/models/transaction.dart' as my_transaction;
 import 'package:tracking_collections/utils/constants.dart';
+import 'package:tracking_collections/utils/globals.dart';
 import 'package:tracking_collections/utils/utils.dart';
 import 'package:tracking_collections/viewmodels/CustomerBasicDetails.dart';
 import 'package:tracking_collections/viewmodels/CustomerList.dart';
@@ -351,11 +352,11 @@ class DBManager {
     return items;
   }
 
-  Future<List<Agent>> getAgentsList(DurationEnum type) async {
+  Future<List<Agent>> getAgentsList() async {
     List<Agent> items = [];
     QuerySnapshot docs = await Firestore.instance
         .collection(agentCollection)
-        .where('durationType', isEqualTo: DurationEnum.values.indexOf(type))
+        .where('head', isEqualTo: currentAgent.id)
         .getDocuments();
     if (docs.documents.length == 0) {
       return items;
