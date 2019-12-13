@@ -531,4 +531,21 @@ class DBManager {
     });
     return ret;
   }
+
+  Future<bool> addNewCity(String cityName) async {
+    bool ret = true;
+    City city = City();
+    city.name = cityName;
+    DocumentReference dr = await Firestore.instance
+        .collection(cityCollection)
+        .add(city.toMap())
+        .catchError((e) {
+      ret = false;
+    });
+    if (ret) {
+      city.id = dr.documentID;
+      cities.add(city);
+    }
+    return ret;
+  }
 }

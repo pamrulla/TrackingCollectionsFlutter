@@ -248,14 +248,5 @@ class _AgentListScreenState extends State<AgentListScreen> {
         },
       ),
     );
-    /*Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) {
-        return AddCustomerScreen(
-          currentMode: duration,
-          agent: agent.id,
-        );
-      }),
-    );*/
   }
 }

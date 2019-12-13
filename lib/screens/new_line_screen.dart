@@ -7,10 +7,13 @@ import 'package:tracking_collections/components/form_sub_heading_text.dart';
 import 'package:tracking_collections/components/goto_home_widget.dart';
 import 'package:tracking_collections/components/loading_please_wait.dart';
 import 'package:tracking_collections/components/logout_widget.dart';
+import 'package:tracking_collections/components/myRaisedButton.dart';
 import 'package:tracking_collections/components/show_select_city.dart';
 import 'package:tracking_collections/models/agent.dart';
+import 'package:tracking_collections/models/city.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/screens/add_customer_screen.dart';
+import 'package:tracking_collections/screens/add_new_city_bottom_screen.dart';
 import 'package:tracking_collections/utils/auth.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/globals.dart';
@@ -34,6 +37,7 @@ class _NewLineScreenState extends State<NewLineScreen> {
 
   Agent agent = Agent();
   bool isLoading = false;
+  City newCity = City();
 
   @override
   void initState() {
@@ -78,13 +82,45 @@ class _NewLineScreenState extends State<NewLineScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: ShowSelectCity(
-                                      onSelected: (value) {
-                                        agent.city[0] = value.id;
-                                      },
+                                  Container(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: <Widget>[
+                                          ShowSelectCity(
+                                            onSelected: (value) {
+                                              agent.city[0] = value.id;
+                                            },
+                                          ),
+                                          SizedBox(
+                                            height: 20.0,
+                                          ),
+                                          Text(
+                                            'OR',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.redAccent,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          SizedBox(
+                                            height: 20.0,
+                                          ),
+                                          MyRaisedButton(
+                                            name: 'Add New Line Name',
+                                            onPressed: doAddNewLine,
+                                          ),
+                                        ],
+                                      ),
                                     ),
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                      color:
+                                          Theme.of(context).primaryColorLight,
+                                      width: 2.0,
+                                    )),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -272,6 +308,19 @@ class _NewLineScreenState extends State<NewLineScreen> {
       }
     } else {
       Navigator.pop(context);
+    }
+  }
+
+  void doAddNewLine() async {
+    bool isSuccess = await showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return AddNewCityBottomScreen();
+      },
+    );
+    if (isSuccess != null && isSuccess) {
+      print(cities.length);
+      setState(() {});
     }
   }
 }
