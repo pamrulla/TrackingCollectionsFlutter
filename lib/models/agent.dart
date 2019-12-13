@@ -4,7 +4,7 @@ class Agent {
   String id = '';
   String name = '';
   String number = '';
-  String city = '';
+  List<String> city = [];
   String userId = '';
   String role = '';
   bool isFirstTime = true;
@@ -26,7 +26,9 @@ class Agent {
     id = map['id'];
     name = map['name'];
     number = map['number'];
-    city = map['city'];
+    map['city'].forEach((e) {
+      city.add(e);
+    });
     userId = map['userId'];
     role = map['role'];
     isFirstTime = map['isFirstTime'];
@@ -37,7 +39,9 @@ class Agent {
     id = doc.documentID;
     name = doc['name'];
     number = doc['number'];
-    city = doc['city'];
+    doc['city'].forEach((e) {
+      city.add(e);
+    });
     userId = doc['userId'];
     role = doc['role'];
     isFirstTime = doc['isFirstTime'];

@@ -1,9 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
-import 'package:tracking_collections/components/goto_home_widget.dart';
 import 'package:tracking_collections/components/loading_please_wait.dart';
-import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/models/documents.dart';
 import 'package:tracking_collections/models/transaction.dart';
@@ -307,64 +305,58 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
   List<Widget> getAppbarActions() {
     List<Widget> items = [];
 
+    List<PopupMenuEntry<headActionsEnum>> entries = [];
+    entries.add(PopupMenuItem<headActionsEnum>(
+      value: headActionsEnum.Home,
+      child: Text('Go to Home'),
+    ));
     if (isHead) {
-      items.add(
-        PopupMenuButton(
-          icon: Icon(Icons.menu),
-          onSelected: (headActionsEnum result) async {
-            switch (result) {
-              case headActionsEnum.LogOut:
-                Utils.logOut(context);
-                break;
-              case headActionsEnum.Home:
-                Navigator.of(context).popUntil((route) => route.isFirst);
-                break;
-              case headActionsEnum.Edit:
-                bool isUpdated = await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) {
-                    return AddCustomerScreen(
-                      currentMode: DurationEnum.Monthly,
-                      currentCustomer: widget.id,
-                    );
-                  }),
-                );
-                onEdit(isUpdated);
-                break;
-              case headActionsEnum.AssignAgent:
-                //TODO Need to implement
-                break;
-            }
-          },
-          itemBuilder: (BuildContext context) =>
-              <PopupMenuEntry<headActionsEnum>>[
-            PopupMenuItem<headActionsEnum>(
-              value: headActionsEnum.Home,
-              child: Text('Go to Home'),
-            ),
-            PopupMenuItem<headActionsEnum>(
-              value: headActionsEnum.Edit,
-              child: Text('Edit Customer'),
-            ),
-            PopupMenuItem<headActionsEnum>(
-              value: headActionsEnum.AssignAgent,
-              child: Text('Assign to Different Agent'),
-            ),
-            PopupMenuItem<headActionsEnum>(
-              value: headActionsEnum.LogOut,
-              child: Text('Logout'),
-            ),
-          ],
-        ),
-      );
-      /*items.add(EditCustomer(
-        currentCustomer: widget.id,
-        onEdit: onEdit,
-      ));*/
-    } else {
-      items.add(GotoHome());
-      items.add(Logout());
+      entries.add(PopupMenuItem<headActionsEnum>(
+        value: headActionsEnum.Edit,
+        child: Text('Edit Customer'),
+      ));
+      entries.add(PopupMenuItem<headActionsEnum>(
+        value: headActionsEnum.AssignAgent,
+        child: Text('Assign to Different Agent'),
+      ));
     }
+    entries.add(PopupMenuItem<headActionsEnum>(
+      value: headActionsEnum.LogOut,
+      child: Text('Logout'),
+    ));
+
+    items.add(
+      PopupMenuButton(
+        icon: Icon(Icons.menu),
+        onSelected: (headActionsEnum result) async {
+          switch (result) {
+            case headActionsEnum.LogOut:
+              Utils.logOut(context);
+              break;
+            case headActionsEnum.Home:
+              Navigator.of(context).popUntil((route) => route.isFirst);
+              break;
+            case headActionsEnum.Edit:
+              bool isUpdated = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return AddCustomerScreen(
+                    currentMode: DurationEnum.Monthly,
+                    currentCustomer: widget.id,
+                  );
+                }),
+              );
+              onEdit(isUpdated);
+              break;
+            case headActionsEnum.AssignAgent:
+              //TODO Assign Customer to Other Agent
+              break;
+          }
+        },
+        itemBuilder: (BuildContext context) => entries,
+      ),
+    );
+
     return items;
   }
 

@@ -188,12 +188,13 @@ class DBManager {
   }
 
   Future<List<CustomersList>> getCustomerList(
-      String agent, DurationEnum duration) async {
+      String agent, DurationEnum duration, String city) async {
     List<CustomersList> items = [];
     QuerySnapshot docs = await Firestore.instance
         .collection(lendingInfoCollection)
         .where('agent', isEqualTo: agent)
         .where('durationType', isEqualTo: duration.index)
+        .where('city', isEqualTo: city)
         .getDocuments();
     for (int i = 0; i < docs.documents.length; ++i) {
       prefix0.DocumentSnapshot doc = docs.documents[i];

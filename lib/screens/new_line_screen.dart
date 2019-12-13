@@ -40,7 +40,7 @@ class _NewLineScreenState extends State<NewLineScreen> {
     super.initState();
     _textEditingControllerAgentName.clear();
     _textEditingControllerAgentNumber.clear();
-    agent.city = cities[0].id;
+    agent.city.add(cities[0].id);
   }
 
   @override
@@ -82,7 +82,7 @@ class _NewLineScreenState extends State<NewLineScreen> {
                                     padding: const EdgeInsets.all(8.0),
                                     child: ShowSelectCity(
                                       onSelected: (value) {
-                                        agent.city = value.id;
+                                        agent.city[0] = value.id;
                                       },
                                     ),
                                   ),

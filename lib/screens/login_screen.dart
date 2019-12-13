@@ -4,7 +4,6 @@ import 'package:tracking_collections/components/loading_please_wait.dart';
 import 'package:tracking_collections/components/myRaisedButton.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/screens/change_password_screen.dart';
-import 'package:tracking_collections/screens/customers_list_screen.dart';
 import 'package:tracking_collections/screens/main_screen.dart';
 import 'package:tracking_collections/utils/auth.dart';
 import 'package:tracking_collections/utils/globals.dart';
@@ -154,17 +153,10 @@ class _LoginScreenState extends State<LoginScreen> {
             return ChangePasswordScreen();
           }));
         } else {
-          if (isHead) {
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) {
-              return MainScreen();
-            }));
-          } else {
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) {
-              return CustomersListScreen();
-            }));
-          }
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) {
+            return MainScreen();
+          }));
         }
       } else {
         Utils.showErrorSnackBar(_globalKey,

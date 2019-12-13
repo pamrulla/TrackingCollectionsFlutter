@@ -4,7 +4,6 @@ import 'package:tracking_collections/components/appbar_title_with_subtitle.dart'
 import 'package:tracking_collections/components/goto_home_widget.dart';
 import 'package:tracking_collections/components/loading_please_wait.dart';
 import 'package:tracking_collections/components/logout_widget.dart';
-import 'package:tracking_collections/models/agent.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/screens/add_customer_screen.dart';
 import 'package:tracking_collections/screens/customer_view_screen.dart';
@@ -12,11 +11,12 @@ import 'package:tracking_collections/screens/duration_bottom_screen.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/globals.dart';
 import 'package:tracking_collections/viewmodels/CustomerList.dart';
+import 'package:tracking_collections/viewmodels/agent_view_model.dart';
 
 class CustomersListScreen extends StatefulWidget {
-  final Agent agent;
+  final AgentViewModel agent;
   final DurationEnum currentDuration;
-  CustomersListScreen({@required this.agent, @required this.currentDuration});
+  CustomersListScreen({this.agent, this.currentDuration});
 
   @override
   _CustomersListScreenState createState() => _CustomersListScreenState();
@@ -92,8 +92,7 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
       ),
       body: FutureBuilder(
           future: DBManager.instance.getCustomerList(
-              widget.agent == null ? currentAgent.id : widget.agent.id,
-              widget.currentDuration),
+              widget.agent.id, widget.currentDuration, widget.agent.city),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               customers = snapshot.data;

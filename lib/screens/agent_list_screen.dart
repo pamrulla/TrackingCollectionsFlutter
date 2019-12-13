@@ -10,6 +10,7 @@ import 'package:tracking_collections/screens/customers_list_screen.dart';
 import 'package:tracking_collections/screens/duration_bottom_screen.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/globals.dart';
+import 'package:tracking_collections/viewmodels/agent_view_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AgentListScreen extends StatefulWidget {
@@ -21,7 +22,7 @@ class AgentListScreen extends StatefulWidget {
 
 class _AgentListScreenState extends State<AgentListScreen> {
   Future<List<Agent>> agentsFuture;
-  List<Agent> agents;
+  List<AgentViewModel> agents = [];
   bool sort = false;
   @override
   void initState() {
@@ -29,7 +30,7 @@ class _AgentListScreenState extends State<AgentListScreen> {
     super.initState();
   }
 
-  void onSortColum(int columnIndex, bool ascending) {
+  void onSortColumn(int columnIndex, bool ascending) {
     if (columnIndex == 0) {
       if (ascending) {
         agents.sort((a, b) => cities
@@ -63,9 +64,13 @@ class _AgentListScreenState extends State<AgentListScreen> {
         future: agentsFuture,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            agents = snapshot.data;
-            if (agents[0].id != currentAgent.id) {
-              agents.insert(0, currentAgent);
+            if (agents.length == 0) {
+              agents.addAll(AgentViewModel.fromAgent(currentAgent));
+            }
+            if (agents.length <= currentAgent.city.length) {
+              snapshot.data.forEach((a) {
+                agents.addAll(AgentViewModel.fromAgent(a));
+              });
             }
             if (agents.length == 0) {
               return Center(
@@ -91,13 +96,13 @@ class _AgentListScreenState extends State<AgentListScreen> {
                             sortColumnIndex: 0,
                             columns: [
                               DataColumn(
-                                label: Text('City'),
+                                label: Text('Line'),
                                 numeric: false,
                                 onSort: (columnIndex, ascending) {
                                   setState(() {
                                     sort = !sort;
                                   });
-                                  onSortColum(columnIndex, ascending);
+                                  onSortColumn(columnIndex, ascending);
                                 },
                               ),
                               DataColumn(
@@ -154,7 +159,7 @@ class _AgentListScreenState extends State<AgentListScreen> {
     );
   }
 
-  void viewActionsBottomSheet(Agent agent) async {
+  void viewActionsBottomSheet(AgentViewModel agent) async {
     agentListActionsEnum action = await showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -166,20 +171,21 @@ class _AgentListScreenState extends State<AgentListScreen> {
     }
     if (action == agentListActionsEnum.CustomersList) {
       viewDurationBottomSheet(agent);
-    } /*else if (action == agentListActionsEnum.NewCustomer) {
-      viewDurationBottomSheet(agent);
-    } */
-    else if (action == agentListActionsEnum.CallAgent) {
+    } else if (action == agentListActionsEnum.CallAgent) {
       String url = 'tel:' + agent.number;
       if (await canLaunch(url)) {
         await launch(url);
       } else {
         throw 'Could not launch $url';
       }
+    } else if (action == agentListActionsEnum.AssignAgentToNewLine) {
+      //TODO Assign To Another Line
+    } else if (action == agentListActionsEnum.RemoveAgent) {
+      //TODO Remove the agent
     }
   }
 
-  void viewDurationBottomSheet(Agent agent) async {
+  void viewDurationBottomSheet(AgentViewModel agent) async {
     DurationEnum duration = await showModalBottomSheet(
       context: context,
       builder: (context) {

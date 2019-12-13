@@ -9,7 +9,7 @@ class MyRaisedButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return RaisedButton(
       onPressed: onPressed,
-      padding: EdgeInsets.all(10.0),
+      padding: EdgeInsets.all(20.0),
       elevation: 2.0,
       child: Text(
         name,
