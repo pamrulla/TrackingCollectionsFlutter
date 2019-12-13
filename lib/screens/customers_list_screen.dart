@@ -60,8 +60,9 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
   Widget build(BuildContext context) {
     String subTitle = currentAgent.name;
     if (isHead) {
-      subTitle += " : " + widget.agent.name;
+      subTitle = widget.agent.name;
     }
+    subTitle += " : " + durations[widget.currentDuration.index];
 
     return Scaffold(
       appBar: AppBar(
@@ -74,7 +75,17 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
       floatingActionButton: Tooltip(
         message: "Add New Customer",
         child: FloatingActionButton(
-          onPressed: viewDurationBottomSheet,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) {
+                return AddCustomerScreen(
+                  currentMode: widget.currentDuration,
+                  agent: widget.agent.id,
+                );
+              }),
+            );
+          },
           child: Icon(Icons.add),
           backgroundColor: Theme.of(context).accentColor,
         ),

@@ -83,61 +83,64 @@ class _AgentListScreenState extends State<AgentListScreen> {
                   Expanded(
                     flex: 1,
                     child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: DataTable(
-                          sortAscending: sort,
-                          sortColumnIndex: 0,
-                          columns: [
-                            DataColumn(
-                              label: Text('City'),
-                              numeric: false,
-                              onSort: (columnIndex, ascending) {
-                                setState(() {
-                                  sort = !sort;
-                                });
-                                onSortColum(columnIndex, ascending);
-                              },
-                            ),
-                            DataColumn(
-                              label: Text('Name'),
-                              numeric: false,
-                            ),
-                            DataColumn(
-                              label: Text('Phone'),
-                              numeric: true,
-                            ),
-                          ],
-                          rows: agents
-                              .map(
-                                (agent) => DataRow(
-                                  cells: [
-                                    DataCell(
-                                      Text(cities
-                                          .singleWhere(
-                                              (elem) => elem.id == agent.city)
-                                          .name),
-                                      onTap: () {
-                                        viewActionsBottomSheet(agent);
-                                      },
-                                    ),
-                                    DataCell(
-                                      Text(agent.id == currentAgent.id
-                                          ? 'You'
-                                          : agent.name),
-                                      onTap: () {
-                                        viewActionsBottomSheet(agent);
-                                      },
-                                    ),
-                                    DataCell(
-                                      Text(agent.number),
-                                      onTap: () {
-                                        viewActionsBottomSheet(agent);
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              )
-                              .toList()),
+                      scrollDirection: Axis.horizontal,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: DataTable(
+                            sortAscending: sort,
+                            sortColumnIndex: 0,
+                            columns: [
+                              DataColumn(
+                                label: Text('City'),
+                                numeric: false,
+                                onSort: (columnIndex, ascending) {
+                                  setState(() {
+                                    sort = !sort;
+                                  });
+                                  onSortColum(columnIndex, ascending);
+                                },
+                              ),
+                              DataColumn(
+                                label: Text('Name'),
+                                numeric: false,
+                              ),
+                              DataColumn(
+                                label: Text('Phone'),
+                                numeric: true,
+                              ),
+                            ],
+                            rows: agents
+                                .map(
+                                  (agent) => DataRow(
+                                    cells: [
+                                      DataCell(
+                                        Text(cities
+                                            .singleWhere(
+                                                (elem) => elem.id == agent.city)
+                                            .name),
+                                        onTap: () {
+                                          viewActionsBottomSheet(agent);
+                                        },
+                                      ),
+                                      DataCell(
+                                        Text(agent.id == currentAgent.id
+                                            ? 'You'
+                                            : agent.name),
+                                        onTap: () {
+                                          viewActionsBottomSheet(agent);
+                                        },
+                                      ),
+                                      DataCell(
+                                        Text(agent.number),
+                                        onTap: () {
+                                          viewActionsBottomSheet(agent);
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                )
+                                .toList()),
+                      ),
                     ),
                   ),
                 ],

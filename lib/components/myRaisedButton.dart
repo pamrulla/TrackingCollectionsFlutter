@@ -9,16 +9,16 @@ class MyRaisedButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return RaisedButton(
       onPressed: onPressed,
-      padding: EdgeInsets.all(20.0),
+      padding: EdgeInsets.all(10.0),
       elevation: 2.0,
       child: Text(
         name,
         style: TextStyle(
-          fontSize: 20.0,
-        ),
+            //fontSize: 20.0,
+            ),
       ),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18.0),
+        borderRadius: BorderRadius.circular(8.0),
       ),
     );
   }

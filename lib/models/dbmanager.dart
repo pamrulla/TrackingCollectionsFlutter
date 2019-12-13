@@ -193,7 +193,7 @@ class DBManager {
     QuerySnapshot docs = await Firestore.instance
         .collection(lendingInfoCollection)
         .where('agent', isEqualTo: agent)
-        .where('durationType', isEqualTo: DurationEnum.values.indexOf(duration))
+        .where('durationType', isEqualTo: duration.index)
         .getDocuments();
     for (int i = 0; i < docs.documents.length; ++i) {
       prefix0.DocumentSnapshot doc = docs.documents[i];

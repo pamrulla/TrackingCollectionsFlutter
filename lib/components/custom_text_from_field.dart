@@ -36,7 +36,7 @@ class CustomTextFromField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: EnsureVisibleWhenFocused(
         focusNode: focusNode,
         child: TextFormField(
@@ -58,7 +58,7 @@ class CustomTextFromField extends StatelessWidget {
                 ),
             labelText: hintText,
             border: new OutlineInputBorder(
-              borderRadius: new BorderRadius.circular(25.0),
+              borderRadius: new BorderRadius.circular(50.0),
               borderSide: new BorderSide(),
             ),
           ),

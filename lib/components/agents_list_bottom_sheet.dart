@@ -9,22 +9,19 @@ class AgentSheetBottomScreen extends StatelessWidget {
         onTap: () {
           Navigator.pop(context, agentListActionsEnum.values[i]);
         },
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: ListTile(
-            title: Text(
-              agentListActions[i],
-              style: TextStyle(
-                fontSize: 30.0,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).iconTheme.color,
-              ),
-            ),
-            leading: Icon(
-              agentListActionsIcons[i],
-              size: 40.0,
+        child: ListTile(
+          title: Text(
+            agentListActions[i],
+            style: TextStyle(
+              //fontSize: 30.0,
+              fontWeight: FontWeight.bold,
               color: Theme.of(context).iconTheme.color,
             ),
+          ),
+          leading: Icon(
+            agentListActionsIcons[i],
+            //size: 40.0,
+            color: Theme.of(context).iconTheme.color,
           ),
         ),
       );
@@ -44,12 +41,12 @@ class AgentSheetBottomScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).primaryColor,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(40.0),
-            topRight: Radius.circular(40.0),
+            topLeft: Radius.circular(10.0),
+            topRight: Radius.circular(10.0),
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(5.0),
           child: Column(
             children: getListTiles(context),
           ),

@@ -180,6 +180,8 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(MediaQuery.of(context).size.toString());
+    print(MediaQuery.of(context).size.aspectRatio);
     String currentSubTitle = "";
     if (_currentStep < _subTitles.length) {
       currentSubTitle = _subTitles[_currentStep];
@@ -238,7 +240,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
   }
 
   bool validateLendingInfo() {
-    _lendingInfo.durationType = DurationEnum.values.indexOf(widget.currentMode);
+    _lendingInfo.durationType = widget.currentMode.index;
     _lendingInfo.agent = widget.agent.isEmpty ? currentAgent.id : widget.agent;
     return true;
   }

@@ -45,7 +45,7 @@ class _MainScreenState extends State<MainScreen> {
                   name: 'New Line',
                   icon: Icon(
                     Icons.add_circle,
-                    size: 40.0,
+                    size: 20.0,
                   ),
                   onPressed: () {
                     Navigator.push(context,
@@ -62,7 +62,7 @@ class _MainScreenState extends State<MainScreen> {
                   name: 'Existing Line',
                   icon: Icon(
                     Icons.layers,
-                    size: 40.0,
+                    size: 20.0,
                   ),
                   onPressed: () {
                     Navigator.push(
