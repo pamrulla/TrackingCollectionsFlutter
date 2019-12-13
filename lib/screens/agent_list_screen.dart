@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:tracking_collections/components/agents_list_bottom_sheet.dart';
 import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
-import 'package:tracking_collections/components/goto_home_widget.dart';
 import 'package:tracking_collections/components/loading_please_wait.dart';
-import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/models/agent.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/screens/customers_list_screen.dart';
 import 'package:tracking_collections/screens/duration_bottom_screen.dart';
+import 'package:tracking_collections/screens/remove_agent_screen.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/globals.dart';
+import 'package:tracking_collections/utils/utils.dart';
 import 'package:tracking_collections/viewmodels/agent_view_model.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+enum headActionsEnum { Home, LogOut }
 
 class AgentListScreen extends StatefulWidget {
   AgentListScreen();
@@ -46,19 +48,49 @@ class _AgentListScreenState extends State<AgentListScreen> {
     }
   }
 
+  List<Widget> getAppBarActionsList() {
+    List<Widget> items = [];
+
+    List<PopupMenuEntry<headActionsEnum>> entries = [];
+    entries.add(PopupMenuItem<headActionsEnum>(
+      value: headActionsEnum.Home,
+      child: Text('Go to Home'),
+    ));
+    entries.add(PopupMenuItem<headActionsEnum>(
+      value: headActionsEnum.LogOut,
+      child: Text('Logout'),
+    ));
+
+    items.add(
+      PopupMenuButton(
+        icon: Icon(Icons.menu),
+        onSelected: (headActionsEnum result) async {
+          switch (result) {
+            case headActionsEnum.LogOut:
+              Utils.logOut(context);
+              break;
+            case headActionsEnum.Home:
+              Navigator.of(context).popUntil((route) => route.isFirst);
+              break;
+          }
+        },
+        itemBuilder: (BuildContext context) => entries,
+      ),
+    );
+
+    return items;
+  }
+
   @override
   Widget build(BuildContext context) {
     String subTitle = currentAgent.name;
     return Scaffold(
       appBar: AppBar(
         title: AppbarTitileWithSubtitle(
-          title: 'Existing Lines',
+          title: 'Agents List',
           subTitle: subTitle,
         ),
-        actions: <Widget>[
-          GotoHome(),
-          Logout(),
-        ],
+        actions: getAppBarActionsList(),
       ),
       body: FutureBuilder(
         future: agentsFuture,
@@ -181,7 +213,17 @@ class _AgentListScreenState extends State<AgentListScreen> {
     } else if (action == agentListActionsEnum.AssignAgentToNewLine) {
       //TODO Assign To Another Line
     } else if (action == agentListActionsEnum.RemoveAgent) {
-      //TODO Remove the agent
+      bool isUpdate = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) {
+          return RemoveAgentScreen(agent: agent);
+        }),
+      );
+      if (isUpdate != null && isUpdate) {
+        setState(() {
+          agentsFuture = DBManager.instance.getAgentsList();
+        });
+      }
     }
   }
 

@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_firestore/cloud_firestore.dart' as prefix0;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as fpath;
 import 'package:tracking_collections/models/agent.dart';
@@ -197,7 +196,7 @@ class DBManager {
         .where('city', isEqualTo: city)
         .getDocuments();
     for (int i = 0; i < docs.documents.length; ++i) {
-      prefix0.DocumentSnapshot doc = docs.documents[i];
+      DocumentSnapshot doc = docs.documents[i];
       DocumentSnapshot ds = await Firestore.instance
           .collection(basicDetailsCollection)
           .document(doc['customer'])
@@ -468,6 +467,68 @@ class DBManager {
       ret = false;
     });
 
+    return ret;
+  }
+
+  Future<List<Agent>> getAgentsListForRemoveAgent(
+      String agent, String city) async {
+    List<Agent> items = [];
+    QuerySnapshot docs = await Firestore.instance
+        .collection(agentCollection)
+        .where('head', isEqualTo: currentAgent.id)
+        .where('city', arrayContains: city)
+        .getDocuments();
+    if (docs.documents.length == 0) {
+      return items;
+    }
+    items.add(currentAgent);
+    for (int i = 0; i < docs.documents.length; ++i) {
+      if (docs.documents[i].documentID == agent) {
+        continue;
+      }
+      Agent a = Agent();
+      a.fromDocument(docs.documents[i]);
+      items.add(a);
+    }
+    return items;
+  }
+
+  Future<bool> removeAgent(
+      String currentAgent, String city, String newAgent) async {
+    bool ret = true;
+    QuerySnapshot docs = await Firestore.instance
+        .collection(lendingInfoCollection)
+        .where('agent', isEqualTo: currentAgent)
+        .where('city', isEqualTo: city)
+        .getDocuments();
+    DocumentReference agentDoc =
+        Firestore.instance.collection(agentCollection).document(currentAgent);
+
+    await Firestore.instance.runTransaction((transaction) async {
+      List<DocumentSnapshot> ds = [];
+      //Reads
+      for (int i = 0; i < docs.documents.length; ++i) {
+        ds.add(await transaction.get(docs.documents[i].reference));
+      }
+      DocumentSnapshot as = await transaction.get(agentDoc);
+
+      //Writes
+      for (int i = 0; i < ds.length; ++i) {
+        ds[i].data['agent'] = newAgent;
+        await transaction.update(docs.documents[i].reference, ds[i].data);
+      }
+      Agent ag = Agent();
+      ag.fromDocument(as);
+      ag.city.remove(city);
+      if (ag.city.length == 0) {
+        await transaction.delete(agentDoc);
+      } else {
+        await transaction.update(agentDoc, ag.toMap());
+      }
+    }).catchError((e) {
+      ret = false;
+      print(e);
+    });
     return ret;
   }
 }

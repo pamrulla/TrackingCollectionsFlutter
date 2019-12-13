@@ -18,17 +18,9 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   List<Widget> headWidgets() {
     List<Widget> items = [];
-    /*items.add(Hero(
-      tag: 'logo',
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20.0),
-        child: Image.asset(
-          'images/logo.png',
-          width: 100,
-          height: 100,
-        ),
-      ),
-    ));*/
+    items.add(SizedBox(
+      height: 30.0,
+    ));
     items.add(Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: MyRaisedButton(
