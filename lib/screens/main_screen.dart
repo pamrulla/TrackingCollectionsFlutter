@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tracking_collections/components/appbar_title_with_subtitle.dart';
 import 'package:tracking_collections/components/logout_widget.dart';
 import 'package:tracking_collections/components/myRaisedButton.dart';
 import 'package:tracking_collections/models/city.dart';
@@ -101,24 +100,62 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: AppbarTitileWithSubtitle(
-          title: 'Tracking Collections',
-          subTitle: currentAgent.name + ': Home',
-        ),
-        actions: <Widget>[
-          Logout(),
-        ],
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(30.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: isHead ? headWidgets() : agentWidgets(),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: Card(
+              color: Theme.of(context).primaryColorDark,
+              elevation: 15,
+              margin: EdgeInsets.all(0),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10.0, vertical: 20.0),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          Text(
+                            'Tracking Collections',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Logout(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: isHead ? headWidgets() : agentWidgets(),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
