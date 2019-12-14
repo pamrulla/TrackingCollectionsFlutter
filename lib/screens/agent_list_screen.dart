@@ -4,6 +4,7 @@ import 'package:tracking_collections/components/appbar_title_with_subtitle.dart'
 import 'package:tracking_collections/components/loading_please_wait.dart';
 import 'package:tracking_collections/models/agent.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
+import 'package:tracking_collections/screens/agent_add_line_screen.dart';
 import 'package:tracking_collections/screens/customers_list_screen.dart';
 import 'package:tracking_collections/screens/duration_bottom_screen.dart';
 import 'package:tracking_collections/screens/new_line_screen.dart';
@@ -234,7 +235,15 @@ class _AgentListScreenState extends State<AgentListScreen> {
         throw 'Could not launch $url';
       }
     } else if (action == agentListActionsEnum.AssignAgentToNewLine) {
-      //TODO Assign To Another Line
+      bool isUpdate = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) {
+          return AgentAddLineScreen(agent: agent);
+        }),
+      );
+      if (isUpdate != null && isUpdate) {
+        refreshAgents();
+      }
     } else if (action == agentListActionsEnum.RemoveAgent) {
       bool isUpdate = await Navigator.push(
         context,
@@ -243,9 +252,7 @@ class _AgentListScreenState extends State<AgentListScreen> {
         }),
       );
       if (isUpdate != null && isUpdate) {
-        setState(() {
-          agentsFuture = DBManager.instance.getAgentsList();
-        });
+        refreshAgents();
       }
     }
   }

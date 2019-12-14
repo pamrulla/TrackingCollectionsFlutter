@@ -14,7 +14,8 @@ class Authorization {
     if (result == null) {
       return false;
     }
-    currentAgent = await DBManager.instance.getAgentInfo(result.user.uid);
+    currentAgent =
+        await DBManager.instance.getAgentInfoFromUserId(result.user.uid);
     Utils.checkIsHead();
     return true;
   }

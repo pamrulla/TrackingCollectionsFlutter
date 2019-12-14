@@ -53,7 +53,7 @@ class DBManager {
     }
   }
 
-  Future<Agent> getAgentInfo(String userId) async {
+  Future<Agent> getAgentInfoFromUserId(String userId) async {
     Agent agent = Agent();
     QuerySnapshot docs = await Firestore.instance
         .collection(agentCollection)
@@ -63,6 +63,14 @@ class DBManager {
       return null;
     }
     agent.fromDocument(docs.documents[0]);
+    return agent;
+  }
+
+  Future<Agent> getAgentInfo(String id) async {
+    Agent agent = Agent();
+    DocumentSnapshot doc =
+        await Firestore.instance.collection(agentCollection).document(id).get();
+    agent.fromDocument(doc);
     return agent;
   }
 
