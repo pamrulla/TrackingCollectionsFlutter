@@ -38,6 +38,7 @@ class _NewLineScreenState extends State<NewLineScreen> {
   Agent agent = Agent();
   bool isLoading = false;
   City newCity = City();
+  String _addedCity = '';
 
   @override
   void initState() {
@@ -76,7 +77,7 @@ class _NewLineScreenState extends State<NewLineScreen> {
                       child: Form(
                           key: _formKey,
                           child: Padding(
-                            padding: const EdgeInsets.all(40.0),
+                            padding: const EdgeInsets.all(10.0),
                             child: Container(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -84,12 +85,13 @@ class _NewLineScreenState extends State<NewLineScreen> {
                                 children: <Widget>[
                                   Container(
                                     child: Padding(
-                                      padding: const EdgeInsets.all(10.0),
+                                      padding: const EdgeInsets.all(5.0),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,
                                         children: <Widget>[
                                           ShowSelectCity(
+                                            city: _addedCity,
                                             onSelected: (value) {
                                               agent.city[0] = value.id;
                                             },
@@ -312,15 +314,16 @@ class _NewLineScreenState extends State<NewLineScreen> {
   }
 
   void doAddNewLine() async {
-    bool isSuccess = await showModalBottomSheet(
+    String ret = await showModalBottomSheet<String>(
       context: context,
       builder: (context) {
         return AddNewCityBottomScreen();
       },
     );
-    if (isSuccess != null && isSuccess) {
-      print(cities.length);
-      setState(() {});
+    if (ret != null && ret.isNotEmpty) {
+      setState(() {
+        _addedCity = ret;
+      });
     }
   }
 }

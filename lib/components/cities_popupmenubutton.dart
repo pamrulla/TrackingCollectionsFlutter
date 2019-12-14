@@ -13,6 +13,7 @@ class CitiesPopUpMenuButton extends StatefulWidget {
 
 class _CitiesPopUpMenuButtonState extends State<CitiesPopUpMenuButton> {
   City _current = cities[0];
+  String _previousCity = '';
   List<PopupMenuEntry<City>> buildItems(BuildContext context) {
     List<PopupMenuEntry<City>> items = [];
     for (int i = 0; i < cities.length; ++i) {
@@ -28,6 +29,7 @@ class _CitiesPopUpMenuButtonState extends State<CitiesPopUpMenuButton> {
   @override
   void initState() {
     super.initState();
+    _previousCity = widget.city;
     if (widget.city.isNotEmpty) {
       _current = cities.singleWhere((elem) => elem.id == widget.city);
     }
@@ -35,6 +37,11 @@ class _CitiesPopUpMenuButtonState extends State<CitiesPopUpMenuButton> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.city.isNotEmpty && _previousCity != widget.city) {
+      _current = cities.singleWhere((elem) => elem.id == widget.city);
+      widget.onSelected(_current);
+      _previousCity = widget.city;
+    }
     return PopupMenuButton<City>(
       onSelected: (value) {
         setState(() {
@@ -50,7 +57,6 @@ class _CitiesPopUpMenuButtonState extends State<CitiesPopUpMenuButton> {
               _current.name,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 20.0,
               ),
             ),
             Icon(

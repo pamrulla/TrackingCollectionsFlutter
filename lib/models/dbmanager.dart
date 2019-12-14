@@ -31,17 +31,15 @@ class DBManager {
 
   static DBManager instance = DBManager._privateConstructor();
 
-  void getCitiesList() async {
-    if (cities.length != 0) {
-      return;
+  Future<void> getCitiesList() async {
+    cities.clear();
+    QuerySnapshot docs =
+        await Firestore.instance.collection(cityCollection).getDocuments();
+    for (int i = 0; i < docs.documents.length; ++i) {
+      City city = City();
+      city.fromDocument(docs.documents[i]);
+      cities.add(city);
     }
-    Firestore.instance.collection(cityCollection).snapshots().listen((data) {
-      data.documents.forEach((doc) {
-        City city = City();
-        city.fromDocument(doc);
-        cities.add(city);
-      });
-    });
   }
 
   Future<bool> addAgent(Agent agent) async {
@@ -532,7 +530,7 @@ class DBManager {
     return ret;
   }
 
-  Future<bool> addNewCity(String cityName) async {
+  Future<String> addNewCity(String cityName) async {
     bool ret = true;
     City city = City();
     city.name = cityName;
@@ -543,9 +541,9 @@ class DBManager {
       ret = false;
     });
     if (ret) {
-      city.id = dr.documentID;
-      cities.add(city);
+      await getCitiesList();
+      return dr.documentID;
     }
-    return ret;
+    return '';
   }
 }

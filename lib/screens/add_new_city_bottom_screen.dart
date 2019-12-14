@@ -119,10 +119,10 @@ class _AddNewCityBottomScreenState extends State<AddNewCityBottomScreen> {
             text: 'Entered Name already exists');
         return;
       }
-      bool isSuccess = await DBManager.instance.addNewCity(_cityName);
+      String isSuccess = await DBManager.instance.addNewCity(_cityName);
       displayLoading(false);
-      if (isSuccess) {
-        Navigator.pop(context, true);
+      if (isSuccess != null && isSuccess.isNotEmpty) {
+        Navigator.pop(context, isSuccess);
       } else {
         Utils.showErrorSnackBar(_globalKey,
             text:

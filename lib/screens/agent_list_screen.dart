@@ -6,6 +6,7 @@ import 'package:tracking_collections/models/agent.dart';
 import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/screens/customers_list_screen.dart';
 import 'package:tracking_collections/screens/duration_bottom_screen.dart';
+import 'package:tracking_collections/screens/new_line_screen.dart';
 import 'package:tracking_collections/screens/remove_agent_screen.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/globals.dart';
@@ -13,7 +14,7 @@ import 'package:tracking_collections/utils/utils.dart';
 import 'package:tracking_collections/viewmodels/agent_view_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-enum headActionsEnum { Home, LogOut }
+enum headActionsEnum { Home, LogOut, Refresh }
 
 class AgentListScreen extends StatefulWidget {
   AgentListScreen();
@@ -35,17 +36,18 @@ class _AgentListScreenState extends State<AgentListScreen> {
   void onSortColumn(int columnIndex, bool ascending) {
     if (columnIndex == 0) {
       if (ascending) {
-        agents.sort((a, b) => cities
-            .singleWhere((elem) => elem.id == a.city)
-            .name
-            .compareTo(cities.singleWhere((elem) => elem.id == b.city).name));
+        sortAsc();
       } else {
-        agents.sort((a, b) => cities
-            .singleWhere((elem) => elem.id == b.city)
-            .name
-            .compareTo(cities.singleWhere((elem) => elem.id == a.city).name));
+        sortDsc();
       }
     }
+  }
+
+  void refreshAgents() async {
+    setState(() {
+      agents.clear();
+      agentsFuture = DBManager.instance.getAgentsList();
+    });
   }
 
   List<Widget> getAppBarActionsList() {
@@ -55,6 +57,10 @@ class _AgentListScreenState extends State<AgentListScreen> {
     entries.add(PopupMenuItem<headActionsEnum>(
       value: headActionsEnum.Home,
       child: Text('Go to Home'),
+    ));
+    entries.add(PopupMenuItem<headActionsEnum>(
+      value: headActionsEnum.Refresh,
+      child: Text('Refresh'),
     ));
     entries.add(PopupMenuItem<headActionsEnum>(
       value: headActionsEnum.LogOut,
@@ -68,6 +74,9 @@ class _AgentListScreenState extends State<AgentListScreen> {
           switch (result) {
             case headActionsEnum.LogOut:
               Utils.logOut(context);
+              break;
+            case headActionsEnum.Refresh:
+              refreshAgents();
               break;
             case headActionsEnum.Home:
               Navigator.of(context).popUntil((route) => route.isFirst);
@@ -92,6 +101,19 @@ class _AgentListScreenState extends State<AgentListScreen> {
         ),
         actions: getAppBarActionsList(),
       ),
+      floatingActionButton: Tooltip(
+        message: 'Add New Agent',
+        child: FloatingActionButton(
+          onPressed: () async {
+            await Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return NewLineScreen();
+            }));
+            refreshAgents();
+          },
+          child: Icon(Icons.add),
+          backgroundColor: Theme.of(context).accentColor,
+        ),
+      ),
       body: FutureBuilder(
         future: agentsFuture,
         builder: (context, snapshot) {
@@ -103,6 +125,7 @@ class _AgentListScreenState extends State<AgentListScreen> {
               snapshot.data.forEach((a) {
                 agents.addAll(AgentViewModel.fromAgent(a));
               });
+              sortAsc();
             }
             if (agents.length == 0) {
               return Center(
@@ -248,5 +271,19 @@ class _AgentListScreenState extends State<AgentListScreen> {
         },
       ),
     );
+  }
+
+  void sortAsc() {
+    agents.sort((a, b) => cities
+        .singleWhere((elem) => elem.id == a.city)
+        .name
+        .compareTo(cities.singleWhere((elem) => elem.id == b.city).name));
+  }
+
+  void sortDsc() {
+    agents.sort((a, b) => cities
+        .singleWhere((elem) => elem.id == b.city)
+        .name
+        .compareTo(cities.singleWhere((elem) => elem.id == a.city).name));
   }
 }
