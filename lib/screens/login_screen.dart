@@ -6,6 +6,7 @@ import 'package:tracking_collections/models/dbmanager.dart';
 import 'package:tracking_collections/screens/change_password_screen.dart';
 import 'package:tracking_collections/screens/main_screen.dart';
 import 'package:tracking_collections/utils/auth.dart';
+import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/globals.dart';
 import 'package:tracking_collections/utils/utils.dart';
 
@@ -33,7 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     _textEditingControllerPassword.clear();
     _textEditingControllerUserName.clear();
-    DBManager.instance.getCitiesList();
   }
 
   @override
@@ -145,6 +145,8 @@ class _LoginScreenState extends State<LoginScreen> {
       _form.save();
       setLoggingIn(true);
       bool ret = await Authorization().logIn(_userName, _password);
+      await DBManager.instance.getCitiesList();
+      print(cities.length);
       setLoggingIn(false);
       if (ret) {
         if (loggedinAgent.isFirstTime) {
