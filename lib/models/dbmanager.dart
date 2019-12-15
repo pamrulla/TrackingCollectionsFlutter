@@ -365,7 +365,7 @@ class DBManager {
     List<Agent> items = [];
     QuerySnapshot docs = await Firestore.instance
         .collection(agentCollection)
-        .where('head', isEqualTo: currentAgent.id)
+        .where('head', isEqualTo: loggedinAgent.id)
         .getDocuments();
     if (docs.documents.length == 0) {
       return items;
@@ -477,18 +477,20 @@ class DBManager {
     return ret;
   }
 
-  Future<List<Agent>> getAgentsListForRemoveAgent(
-      String agent, String city) async {
+  Future<List<Agent>> getAgentsListForRemoveAgent(String agent, String city,
+      {bool isChangeAgent = false}) async {
     List<Agent> items = [];
     QuerySnapshot docs = await Firestore.instance
         .collection(agentCollection)
-        .where('head', isEqualTo: currentAgent.id)
+        .where('head', isEqualTo: loggedinAgent.id)
         .where('city', arrayContains: city)
         .getDocuments();
     if (docs.documents.length == 0) {
       return items;
     }
-    items.add(currentAgent);
+    if (isChangeAgent == false) {
+      items.add(loggedinAgent);
+    }
     for (int i = 0; i < docs.documents.length; ++i) {
       if (docs.documents[i].documentID == agent) {
         continue;
@@ -541,18 +543,51 @@ class DBManager {
 
   Future<String> addNewCity(String cityName) async {
     bool ret = true;
+    WriteBatch batch = Firestore.instance.batch();
     City city = City();
     city.name = cityName;
-    DocumentReference dr = await Firestore.instance
-        .collection(cityCollection)
-        .add(city.toMap())
-        .catchError((e) {
+    DocumentReference dr =
+        Firestore.instance.collection(cityCollection).document();
+    batch.setData(dr, city.toMap());
+    loggedinAgent.city.add(dr.documentID);
+    DocumentReference ar = Firestore.instance
+        .collection(agentCollection)
+        .document(loggedinAgent.id);
+    batch.updateData(ar, loggedinAgent.toMap());
+
+    batch.commit().catchError((e) {
       ret = false;
     });
+
     if (ret) {
       await getCitiesList();
       return dr.documentID;
     }
+    loggedinAgent.city.removeLast();
     return '';
+  }
+
+  Future<bool> transferCustomer(String customerId, String agentid) async {
+    bool ret = true;
+    DocumentSnapshot ds = await Firestore.instance
+        .collection(lendingInfoCollection)
+        .document(customerId)
+        .get()
+        .catchError((e) {
+      ret = false;
+    });
+    if (ret) {
+      LendingInfo li = LendingInfo();
+      li.fromDocument(ds);
+      li.agent = agentid;
+      await Firestore.instance
+          .collection(lendingInfoCollection)
+          .document(customerId)
+          .updateData(li.toMap())
+          .catchError((e) {
+        ret = false;
+      });
+    }
+    return ret;
   }
 }

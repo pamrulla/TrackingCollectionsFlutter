@@ -51,7 +51,7 @@ class _MainScreenState extends State<MainScreen> {
 
   List<Widget> agentWidgets() {
     List<Widget> items = [];
-    currentAgent.city.forEach((c) {
+    loggedinAgent.city.forEach((c) {
       City ct = cities.singleWhere((e) => e.id == c);
       items.add(Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
@@ -82,7 +82,7 @@ class _MainScreenState extends State<MainScreen> {
         builder: (context) {
           return CustomersListScreen(
             currentDuration: duration,
-            agent: AgentViewModel.createFromAgent(currentAgent, city),
+            agent: AgentViewModel.createFromAgent(loggedinAgent, city),
           );
         },
       ),

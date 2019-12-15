@@ -14,7 +14,7 @@ class Authorization {
     if (result == null) {
       return false;
     }
-    currentAgent =
+    loggedinAgent =
         await DBManager.instance.getAgentInfoFromUserId(result.user.uid);
     Utils.checkIsHead();
     return true;
@@ -32,8 +32,8 @@ class Authorization {
       ret = false;
     });
     if (ret) {
-      currentAgent.isFirstTime = false;
-      await DBManager.instance.updateAgent(currentAgent);
+      loggedinAgent.isFirstTime = false;
+      await DBManager.instance.updateAgent(loggedinAgent);
     }
     return ret;
   }

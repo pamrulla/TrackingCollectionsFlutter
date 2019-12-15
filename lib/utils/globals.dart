@@ -1,4 +1,4 @@
 import 'package:tracking_collections/models/agent.dart';
 
-Agent currentAgent = Agent();
+Agent loggedinAgent = Agent();
 bool isHead = false;

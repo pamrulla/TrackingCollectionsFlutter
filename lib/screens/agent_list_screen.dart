@@ -93,7 +93,7 @@ class _AgentListScreenState extends State<AgentListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String subTitle = currentAgent.name;
+    String subTitle = loggedinAgent.name;
     return Scaffold(
       appBar: AppBar(
         title: AppbarTitileWithSubtitle(
@@ -120,9 +120,9 @@ class _AgentListScreenState extends State<AgentListScreen> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             if (agents.length == 0) {
-              agents.addAll(AgentViewModel.fromAgent(currentAgent));
+              agents.addAll(AgentViewModel.fromAgent(loggedinAgent));
             }
-            if (agents.length <= currentAgent.city.length) {
+            if (agents.length <= loggedinAgent.city.length) {
               snapshot.data.forEach((a) {
                 agents.addAll(AgentViewModel.fromAgent(a));
               });
@@ -184,7 +184,7 @@ class _AgentListScreenState extends State<AgentListScreen> {
                                         },
                                       ),
                                       DataCell(
-                                        Text(agent.id == currentAgent.id
+                                        Text(agent.id == loggedinAgent.id
                                             ? 'You'
                                             : agent.name),
                                         onTap: () {

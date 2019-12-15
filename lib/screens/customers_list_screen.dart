@@ -86,7 +86,7 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String subTitle = currentAgent.name;
+    String subTitle = loggedinAgent.name;
     if (isHead) {
       subTitle = widget.agent.name;
     }

@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
       bool ret = await Authorization().logIn(_userName, _password);
       setLoggingIn(false);
       if (ret) {
-        if (currentAgent.isFirstTime) {
+        if (loggedinAgent.isFirstTime) {
           Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) {
             return ChangePasswordScreen();

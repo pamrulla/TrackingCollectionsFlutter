@@ -89,6 +89,6 @@ class Utils {
   }
 
   static void checkIsHead() {
-    isHead = currentAgent.role == 'head';
+    isHead = loggedinAgent.role == 'head';
   }
 }

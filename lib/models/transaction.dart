@@ -23,7 +23,7 @@ class Transaction {
     agent = doc['agent'];
     customer = doc['customer'];
     type = doc['type'];
-    amount = doc['amount'];
+    amount = double.tryParse(doc['amount'].toString());
     date = doc['date'].toDate();
   }
 }

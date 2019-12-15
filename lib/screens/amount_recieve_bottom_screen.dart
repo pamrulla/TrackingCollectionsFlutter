@@ -39,7 +39,7 @@ class _AmountRecieveBottomScreenState extends State<AmountRecieveBottomScreen> {
     trans.customer = widget.customer;
     trans.amount = 0;
     trans.date = DateTime.now();
-    trans.agent = currentAgent.id;
+    trans.agent = loggedinAgent.id;
     trans.type = widget.title.contains('Penalty') ? 1 : 0;
     _textEditingControllerDate.text = Utils.getDateDisplayFormat(trans.date);
   }

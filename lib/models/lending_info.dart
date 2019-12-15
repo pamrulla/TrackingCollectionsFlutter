@@ -30,9 +30,9 @@ class LendingInfo {
     durationType = map['durationType'];
     city = map['city'];
     date = map['date'].toDate();
-    amount = map['amount'];
+    amount = double.tryParse(map['amount'].toString());
     months = map['months'];
-    interestRate = map['interestRate'];
+    interestRate = double.tryParse(map['interestRate'].toString());
     agent = map['agent'];
   }
 }

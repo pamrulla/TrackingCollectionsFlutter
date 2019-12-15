@@ -241,7 +241,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
 
   bool validateLendingInfo() {
     _lendingInfo.durationType = widget.currentMode.index;
-    _lendingInfo.agent = widget.agent.isEmpty ? currentAgent.id : widget.agent;
+    _lendingInfo.agent = widget.agent.isEmpty ? loggedinAgent.id : widget.agent;
     return true;
   }
 

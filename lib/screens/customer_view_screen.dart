@@ -7,6 +7,7 @@ import 'package:tracking_collections/models/documents.dart';
 import 'package:tracking_collections/models/transaction.dart';
 import 'package:tracking_collections/screens/add_customer_screen.dart';
 import 'package:tracking_collections/screens/amount_recieve_bottom_screen.dart';
+import 'package:tracking_collections/screens/change_agent_screen.dart';
 import 'package:tracking_collections/screens/image_viewer_screen.dart';
 import 'package:tracking_collections/utils/constants.dart';
 import 'package:tracking_collections/utils/globals.dart';
@@ -229,7 +230,7 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           TableRow(
-            'Per Month',
+            'Per Installation',
             _perMonth.toString(),
             isAmount: true,
           ),
@@ -349,7 +350,17 @@ class _CustomerViewScreenState extends State<CustomerViewScreen>
               onEdit(isUpdated);
               break;
             case headActionsEnum.AssignAgent:
-              //TODO Assign Customer to Other Agent
+              bool isUpdated = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return ChangeAgentScreen(
+                    city: _customerBasicDetails.lendingInfo.city,
+                    currentAgent: _customerBasicDetails.lendingInfo.agent,
+                    customerId: _customerBasicDetails.lendingInfo.id,
+                  );
+                }),
+              );
+              onEdit(isUpdated);
               break;
           }
         },

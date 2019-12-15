@@ -79,7 +79,7 @@ class _RemoveAgentScreenState extends State<RemoveAgentScreen> {
     ));
     _agents.asMap().forEach((i, a) {
       items.add(ListTile(
-        title: Text(a.id == currentAgent.id ? 'You' : a.name),
+        title: Text(a.id == loggedinAgent.id ? 'You' : a.name),
         leading: Radio(
           value: i,
           groupValue: _selectedAgentIndex,

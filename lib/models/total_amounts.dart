@@ -17,7 +17,7 @@ class TotalAmounts {
   void fromDocument(DocumentSnapshot doc) {
     id = doc.documentID;
     customer = doc['customer'];
-    totalRepaid = doc['totalRepaid'];
-    totalPenalty = doc['totalPenalty'];
+    totalRepaid = double.tryParse(doc['totalRepaid'].toString());
+    totalPenalty = double.tryParse(doc['totalPenalty'].toString());
   }
 }

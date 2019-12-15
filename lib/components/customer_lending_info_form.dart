@@ -114,16 +114,16 @@ class _CustomerLendingInfoFormState extends State<CustomerLendingInfoForm> {
           CustomTextFromField(
             focusNode: _focusNodeMonths,
             icon: Icons.verified_user,
-            hintText: 'Months',
+            hintText: 'Months/Weeks/Days',
             validator: (value) {
               if (value.isEmpty) {
-                return 'Months should not be empty';
+                return 'Months/Weeks/Days should not be empty';
               } else if (!Utils.isNumeric(value)) {
-                return 'Months is invalid';
+                return 'Months/Weeks/Days is invalid';
               } else {
                 double val = double.parse(value);
                 if (val <= 0) {
-                  return 'Months should be greater than zero.';
+                  return 'Months/Weeks/Days should be greater than zero.';
                 }
               }
               return null;

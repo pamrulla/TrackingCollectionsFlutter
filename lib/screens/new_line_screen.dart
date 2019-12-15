@@ -278,7 +278,7 @@ class _NewLineScreenState extends State<NewLineScreen> {
       if (_formKey.currentState.validate()) {
         displayLoading(true);
         _formKey.currentState.save();
-        agent.head = currentAgent.id;
+        agent.head = loggedinAgent.id;
         agent.role = 'agent';
         List<String> creds = await Authorization().createAgentLogin(agent.name);
         bool isSuccess = true;
