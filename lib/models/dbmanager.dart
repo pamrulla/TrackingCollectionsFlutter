@@ -207,13 +207,14 @@ class DBManager {
           .collection(basicDetailsCollection)
           .document(doc['customer'])
           .get();
-      items.add(CustomersList(
+      CustomersList cl = CustomersList(
         id: ds.documentID,
         interestRate: doc['interestRate'],
         durationType: doc['durationType'],
-        amount: doc['amount'],
+        amount: double.tryParse(doc['amount'].toString()),
         name: ds['name'],
-      ));
+      );
+      items.add(cl);
     }
     return items;
   }
