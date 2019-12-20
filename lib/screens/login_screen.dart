@@ -143,8 +143,17 @@ class _LoginScreenState extends State<LoginScreen> {
     final _form = _formKey.currentState;
     if (_form.validate()) {
       _form.save();
+      print('login');
       setLoggingIn(true);
-      bool ret = await Authorization().logIn(_userName, _password);
+      bool ret =
+          await Authorization().logIn(_userName, _password).catchError((e) {
+        print(e);
+      }).then((b) {
+        print(b);
+        return false;
+      }, onError: () {
+        print('err');
+          });
       setLoggingIn(false);
       if (ret) {
         if (currentAgent.isFirstTime) {

@@ -8,14 +8,21 @@ import 'package:tracking_collections/utils/utils.dart';
 class Authorization {
   Future<bool> logIn(String username, String password) async {
     username += userNameTail;
+    print('here');
+    print(FirebaseAuth.instance);
     AuthResult result = await FirebaseAuth.instance
         .signInWithEmailAndPassword(email: username, password: password)
-        .catchError((e) {});
+        .catchError((e) {
+      throw e;
+    });
     if (result == null) {
       return false;
     }
-    currentAgent =
-        await DBManager.instance.getAgentInfoFromUserId(result.user.uid);
+    currentAgent = await DBManager.instance
+        .getAgentInfoFromUserId(result.user.uid)
+        .catchError((e) {
+      print(e);
+    });
     Utils.checkIsHead();
     return true;
   }
